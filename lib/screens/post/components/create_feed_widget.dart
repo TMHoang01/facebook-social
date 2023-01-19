@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fb_copy/constants.dart';
+import 'package:fb_copy/screens/post/add_post_screen.dart';
 import 'package:flutter/material.dart';
 
 class CreateFeedWidget extends StatelessWidget {
@@ -35,7 +36,10 @@ class CreateFeedWidget extends StatelessWidget {
             ),
             Expanded(
               child: GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  // navigate to create feed screen
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const AddPostScreen()));
+                },
                 child: Container(
                   height: 36,
                   margin: EdgeInsets.only(left: 5),

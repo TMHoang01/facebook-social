@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fb_copy/constants.dart';
 import 'package:flutter/material.dart';
 
 import 'package:fb_copy/models/post_model.dart';
@@ -14,13 +16,15 @@ class PostWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
+      // height: 300.0,
       padding: EdgeInsets.all(15.0),
       child: Column(
         children: <Widget>[
           Row(
             children: <Widget>[
               CircleAvatar(
-                backgroundImage: AssetImage('post.author.avatar'),
+                backgroundImage: AssetImage('assets/images/avatar_default.png'),
                 radius: 20.0,
               ),
               SizedBox(width: 7.0),
@@ -28,9 +32,9 @@ class PostWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text('post.username', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0)),
+                  Text('${post.author ?? 'Người dùng'}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0)),
                   SizedBox(height: 5.0),
-                  Text('post.time')
+                  Text('${post.created}')
                 ],
               ),
             ],
@@ -38,6 +42,41 @@ class PostWidget extends StatelessWidget {
           const SizedBox(height: 20.0),
           Text(post.described ?? '', style: TextStyle(fontSize: 15.0)),
           const SizedBox(height: 10.0),
+          post.image?.isNotEmpty == true && post.image![0] != null
+              ? InkWell(
+                  onTap: () => {},
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: SizedBox(
+                      child: CachedNetworkImage(
+                        imageUrl: post.image![0].url.toString(),
+                        maxHeightDiskCache: 300,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => SizedBox(
+                          child: Container(
+                            color: AppColor.grayColor,
+                            height: 40,
+                            width: 40,
+                          ),
+                          width: MediaQuery.of(context).size.width,
+                          height: 300,
+                        ),
+                        errorWidget: (context, url, error) => SizedBox(
+                          child: Container(
+                            child: Icon(
+                              Icons.error,
+                              size: 40,
+                            ),
+                            color: AppColor.grayColor,
+                          ),
+                          width: MediaQuery.of(context).size.width,
+                          height: 300,
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              : Container(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
@@ -49,8 +88,7 @@ class PostWidget extends StatelessWidget {
               ),
               Row(
                 children: <Widget>[
-                  Text('${post.comment} comments  •  '),
-                  Text('{post.shares} shares'),
+                  Text('${post.comment} bình luận'),
                 ],
               ),
             ],

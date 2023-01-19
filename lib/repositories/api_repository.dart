@@ -1,10 +1,7 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
-
 class ApiResponse {
   String? code;
   String? message;
-  Object? data;
+  dynamic data; // Chỉnh lại thành dynamic
   Object? details;
   ApiResponse({
     this.code,
@@ -29,10 +26,13 @@ class ApiResponse {
     return data;
   }
 
+  dynamic getData(String key) {
+    if (data == null || data[key] == null) return null;
+    return data[key];
+  }
+
   @override
   String toString() {
-    // TODO: implement toString
-
-    return jsonEncode(this.toJson());
+    return 'ApiResponse{code: $code, message: $message, data: $data, details: $details}';
   }
 }

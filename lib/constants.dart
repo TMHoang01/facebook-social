@@ -1,4 +1,36 @@
+import 'package:fb_copy/models/post_model.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+const host = '192.168.1.113';
+const baseUrl = "http://$host:5000/it4788";
+const authUrl = '$baseUrl/auth';
+const friendUrl = '$baseUrl/friend';
+const postUrl = '$baseUrl/post';
+const userUrl = '$baseUrl/user';
+const sreachUrl = '$baseUrl/search';
+const commentUrl = '$baseUrl/comment';
+const likeUrl = '$baseUrl/like';
+const settingUrl = '$baseUrl/setting';
+const chatUrl = '$baseUrl/chat';
+
+String token =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzODM4ZWJjMGUyYjc0NDFiY2RkNDRlZSIsImRhdGVMb2dpbiI6IjIwMjMtMDEtMThUMTU6MDE6NDkuMTIxWiIsImlhdCI6MTY3NDA1NDEwOSwiZXhwIjoxNjc0MTQwNTA5fQ.S0hYnS7m-Tg2T4kDSAbMPEd405nqtKYertzpQzOpGwE';
+
+List<PostModel> listPost = [];
+
+Future<void> checkToken() async {
+  if (token == '') {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    token = prefs.getString('token') ?? '';
+    // create excpetion {code: 9998, message: 'Phiên đăng nhập bạn đã hết hạn vui lòng đăng nhập lại', details: 'Token is invalid'}
+    if (token == '') {
+      Logger().d('Token is invalid');
+      throw Exception('Phiên đăng nhập bạn đã hết hạn vui lòng đăng nhập lại');
+    }
+  }
+}
 
 class AppColor {
   static const Color primaryColor = Color(0xFF1876F2);
@@ -18,18 +50,6 @@ class AppColor {
   static const kGreenComment = Color(0xff00c853);
   static const kDanger = Color(0xffc62828);
 }
-
-const host = '192.168.110.254';
-const baseUrl = "http://$host:5000/it4788";
-const authUrl = '$baseUrl/auth';
-const friendUrl = '$baseUrl/friend';
-const postUrl = '$baseUrl/post';
-const userUrl = '$baseUrl/user';
-const sreachUrl = '$baseUrl/search';
-const commentUrl = '$baseUrl/comment';
-const likeUrl = '$baseUrl/like';
-const settingUrl = '$baseUrl/setting';
-const chatUrl = '$baseUrl/chat';
 
 // ------ Error ------
 const serviceError = 'Service Error';

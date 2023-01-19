@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fb_copy/constants.dart';
 import 'package:fb_copy/screens/home/setting_screen.dart';
 import 'package:fb_copy/screens/loading_screen.dart';
 import 'package:fb_copy/screens/login/login_screen.dart';
@@ -16,11 +17,19 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   TabController? _tabController;
+  final List<Widget> _tabs = [
+    PostScreen(),
+    LoadingScreen(text: '( FriendScreen('),
+    // ProfileScreen(),
+    LoadingScreen(text: '( Watch('),
+    LoadingScreen(text: '( Notify('),
+    MenuTabScreen(),
+  ];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(vsync: this, length: 6);
+    _tabController = TabController(vsync: this, length: 5);
   }
 
   @override
@@ -32,51 +41,85 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Text('facebook',
-                    style: TextStyle(color: Colors.blueAccent, fontSize: 27.0, fontWeight: FontWeight.bold)),
+      body: NestedScrollView(
+        floatHeaderSlivers: true,
+        headerSliverBuilder: (context, innerBoxIsScrolled) => [
+          SliverAppBar(
+            backgroundColor: AppColor.backgroundColor,
+            floating: true,
+            snap: true,
+            // title: _tabController!.index == 0 ? Center(child: TopBarApp()) : null,
+            title: Center(child: TopBarApp()),
+            pinned: true,
+            bottom: TabBar(
+              controller: _tabController,
+              unselectedLabelColor: Colors.grey,
+              labelColor: AppColor.kPrimaryColor,
+              // isScrollable: true,
+              tabs: const <Widget>[
+                Tab(icon: Icon(Icons.home, size: 30.0)),
+                Tab(icon: Icon(Icons.people, size: 30.0)),
+                Tab(icon: Icon(Icons.ondemand_video, size: 30.0)),
+                Tab(icon: Icon(Icons.notifications, size: 30.0)),
+                Tab(icon: Icon(Icons.menu, size: 30.0)),
+                // Tab(icon: Icon(Icons.menu, size: 30.0)),
               ],
             ),
-            Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
-              Icon(Icons.search, color: Colors.black),
-              SizedBox(width: 15.0),
-              // Icon(FontAwesomeIcons.facebookMessenger, color: Colors.black)
-            ]),
-          ],
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0.0,
-        bottom: TabBar(
-          indicatorColor: Colors.blueAccent,
-          controller: _tabController,
-          unselectedLabelColor: Colors.grey,
-          labelColor: Colors.blueAccent,
-          tabs: [
-            Tab(icon: Icon(Icons.home, size: 30.0)),
-            Tab(icon: Icon(Icons.people, size: 30.0)),
-            Tab(icon: Icon(Icons.ondemand_video, size: 30.0)),
-            Tab(icon: Icon(Icons.account_circle, size: 30.0)),
-            Tab(icon: Icon(Icons.notifications, size: 30.0)),
-            Tab(icon: Icon(Icons.menu, size: 30.0))
-          ],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          PostScreen(),
-          LoadingScreen(text: 'Friend'),
-          ProfileScreen(),
-          LoadingScreen(text: 'Watch'),
-          LoadingScreen(text: 'Notify'),
-          MenuTabScreen(),
+          ),
         ],
+        body: TabBarView(
+          controller: _tabController,
+          children: _tabs,
+        ),
       ),
+    );
+  }
+}
+
+class TabBarApp extends StatelessWidget {
+  const TabBarApp({required TabController tabController}) : _tabController = tabController;
+  final TabController _tabController;
+
+  @override
+  Widget build(BuildContext context) {
+    return TabBar(
+      indicatorColor: Colors.blueAccent,
+      controller: _tabController,
+      unselectedLabelColor: Colors.grey,
+      labelColor: Colors.blueAccent,
+      tabs: [
+        Tab(icon: Icon(Icons.home, size: 30.0)),
+        Tab(icon: Icon(Icons.people, size: 30.0)),
+        Tab(icon: Icon(Icons.ondemand_video, size: 30.0)),
+        Tab(icon: Icon(Icons.account_circle, size: 30.0)),
+        Tab(icon: Icon(Icons.notifications, size: 30.0)),
+        Tab(icon: Icon(Icons.menu, size: 30.0))
+      ],
+    );
+  }
+}
+
+class TopBarApp extends StatelessWidget {
+  const TopBarApp({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            Text('facebook', style: TextStyle(color: Colors.blueAccent, fontSize: 27.0, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
+          Icon(Icons.search, color: Colors.black),
+          SizedBox(width: 15.0),
+          // Icon(FontAwesomeIcons.facebookMessenger, color: Colors.black)
+        ]),
+      ],
     );
   }
 }

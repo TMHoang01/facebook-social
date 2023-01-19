@@ -1,18 +1,21 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:fb_copy/blocs/internet/internet_bloc.dart';
 import 'package:fb_copy/blocs/login/login_bloc.dart';
+import 'package:fb_copy/blocs/picker_image/picker_image_bloc.dart';
 import 'package:fb_copy/blocs/post/post_bloc.dart';
-import 'package:fb_copy/models/post_model.dart';
 import 'package:fb_copy/repositories/auth_repository.dart';
+import 'package:fb_copy/repositories/post_repository.dart';
 import 'package:fb_copy/screens/home/home_screen.dart';
 import 'package:fb_copy/screens/login/login_screen.dart';
+import 'package:fb_copy/screens/post/add_post_screen.dart';
 import 'package:fb_copy/screens/post/post_screen.dart';
-import 'package:fb_copy/screens/test_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:fb_copy/app_router.dart';
 import 'package:fb_copy/blocs/AppBlocObserver.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 main() {
   Bloc.observer = AppBlocObserver();
@@ -37,11 +40,9 @@ class MyApp extends StatelessWidget {
           create: (context) => InternetBloc(),
         ),
         BlocProvider(
-          create: (context) => PostBloc()
-            ..add(AddPost(
-                post: PostModel(
-                    id: '123', author: 'userId', title: 'title', described: 'bodyda ', like: '0', comment: '0'))),
+          create: (context) => PostBloc(PostRepository()),
         ),
+        BlocProvider(create: (context) => PickerImageBloc(ImagePicker())),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
@@ -61,6 +62,7 @@ class MyApp extends StatelessWidget {
             }
           },
           child: HomeScreen(),
+          // child: LoginScreen(),
         ),
       ),
     );
