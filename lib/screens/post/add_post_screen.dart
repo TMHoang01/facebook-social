@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:fb_copy/blocs/picker_image/picker_image_bloc.dart';
 import 'package:fb_copy/blocs/post/post_bloc.dart';
 import 'package:fb_copy/constants.dart';
+import 'package:fb_copy/screens/post/components/input_field_widget.dart';
 import 'package:fb_copy/widgets/diaog_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -143,6 +144,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                   controller: _textController,
                   maxLines: null,
                   minLines: 2,
+                  maxLength: 500,
                   style: TextStyle(
                     fontSize: _fontSize,
                     fontWeight: FontWeight.w400,
@@ -152,68 +154,84 @@ class _AddPostScreenState extends State<AddPostScreen> {
                     hintStyle: TextStyle(color: Colors.grey),
                     border: InputBorder.none,
                   ),
+                  inputFormatters: [],
                 ),
+              ),
+              EmojiTextField(
+                textController: _textController,
+                // fontSize: _fontSize,
+                // onEmojiSelected: (emoji) {
+                //   print(emoji);
+                // },
               ),
               const SizedBox(height: 10.0),
 
               // Container(height: 300, color: Colors.amber),
-              BlocBuilder<PickerImageBloc, PickerImageState>(builder: (context, state) {
-                images = state.images;
-                video = state.video;
-                return images != null
-                    ? Wrap(
-                        spacing: 10,
-                        runSpacing: 10,
-                        children: images!
-                            .map((image) => Container(
-                                  child: Stack(
-                                    children: [
-                                      Image.file(
-                                        File(image.path),
-                                        fit: BoxFit.cover,
-                                        width: double.infinity,
-                                        height: 300,
+              BlocConsumer<PickerImageBloc, PickerImageState>(
+                  listener: (context, state) => {
+                        if (state.message != null)
+                          {ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message!)))}
+                      },
+                  builder: (context, state) {
+                    images = state.images;
+                    video = state.video;
+                    return images != null
+                        ? Wrap(
+                            spacing: 10,
+                            runSpacing: 10,
+                            children: images!
+                                .map((image) => Container(
+                                      child: Stack(
+                                        children: [
+                                          Image.file(
+                                            File(image.path),
+                                            fit: BoxFit.cover,
+                                            width: double.infinity,
+                                            height: 300,
+                                          ),
+                                          Positioned(
+                                            right: 10,
+                                            top: 10,
+                                            child: InkWell(
+                                              onTap: () {
+                                                Logger().i('remove image');
+                                                _pickerBloc.add(
+                                                  onRemoveImageEvent(image: image),
+                                                );
+                                              },
+                                              child: Icon(Icons.close, color: Colors.white),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Positioned(
-                                        right: 10,
-                                        top: 10,
-                                        child: InkWell(
-                                            onTap: () {
-                                              Logger().i('remove image');
-                                              _pickerBloc.add(onRemoveImageEvent(image));
-                                            },
-                                            child: Icon(Icons.close, color: Colors.white)),
-                                      ),
-                                    ],
-                                  ),
-                                ))
-                            .toList(),
-                      )
-                    : video != null
-                        ? Container(
-                            child: Stack(
-                              children: [
-                                Image.file(
-                                  File(video!.path),
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  height: 300,
-                                ),
-                                Positioned(
-                                  right: 10,
-                                  top: 10,
-                                  child: InkWell(
-                                      onTap: () {
-                                        Logger().i('remove video');
-                                        _pickerBloc.add(onRemoveVideoEvent());
-                                      },
-                                      child: Icon(Icons.close, color: Colors.white)),
-                                ),
-                              ],
-                            ),
+                                    ))
+                                .toList(),
                           )
-                        : Container();
-              }),
+                        : video != null
+                            ? Container(
+                                child: Stack(
+                                  children: [
+                                    Image.file(
+                                      File(video!.path),
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      height: 300,
+                                    ),
+                                    Positioned(
+                                      right: 10,
+                                      top: 10,
+                                      child: InkWell(
+                                          onTap: () {
+                                            Logger().i('remove video');
+                                            _pickerBloc.add(onRemoveVideoEvent());
+                                          },
+                                          child: Icon(Icons.close, color: Colors.white)),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : Container();
+                  }),
             ],
           ),
         ),

@@ -1,16 +1,13 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:fb_copy/constants.dart';
-import 'package:fb_copy/models/post_model.dart';
 import 'package:fb_copy/repositories/api_repository.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:http_parser/http_parser.dart';
 
@@ -48,7 +45,7 @@ class PostRepository {
 
     try {
       Dio dio = Dio();
-      print('$postUrl/getListPosts last_id: $last_id index: $index count: $count');
+      print('$postUrl/getListPosts last_id: $last_id index: $index count: $count token: $token');
       // checkToken();
       var response = await dio.post(
         '$postUrl/get_list_posts',
@@ -58,10 +55,11 @@ class PostRepository {
           responseType: ResponseType.json,
         ),
         data: {
-          'last_id': '$last_id',
+          'last_id': last_id,
           'index': '$index',
           'count': '$count',
-          'new_item': '$newItem',
+          'token': token,
+          // 'new_item': '$newItem',
         },
       );
 
@@ -74,19 +72,19 @@ class PostRepository {
     return apiResponse;
   }
 
-  Future<ApiResponse> getPostById(String post_id) async {
+  Future<ApiResponse> getPost(String post_id) async {
     ApiResponse apiResponse = ApiResponse();
 
     try {
-      print('$postUrl/getPostById');
+      print('$postUrl/get_post');
       checkToken();
       var response = await http.post(
-        Uri.parse('$postUrl/get_post_by_id'),
+        Uri.parse('$postUrl/get_post'),
         headers: {
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          'post_id': '$post_id',
+          'id': post_id,
           'token': token,
         }),
       );
@@ -119,7 +117,7 @@ class PostRepository {
           formData.files.add(
             MapEntry(
               "image",
-              await MultipartFile.fromBytes(
+              MultipartFile.fromBytes(
                 await images[i].readAsBytes(),
                 filename: images[i].name,
                 contentType: MediaType('image', 'jpg|jpeg|png'),
@@ -133,7 +131,7 @@ class PostRepository {
         formData.files.add(
           MapEntry(
             "video",
-            await MultipartFile.fromBytes(
+            MultipartFile.fromBytes(
               await video.readAsBytes(),
               filename: video.name,
               contentType: MediaType('video', 'mp4'),
@@ -155,6 +153,141 @@ class PostRepository {
       // Logger().d('response: ${response.statusCode} \n data: ${response.data} \n ');
       apiResponse = ApiResponse.fromJson(response.data);
       Logger().d('apiResponse: ${apiResponse.toJson()}');
+    } catch (e) {
+      print(e);
+      Logger().e(e);
+      apiResponse.message = serviceError;
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> editPost(
+      {String? postId,
+      String? described,
+      String? status,
+      List<XFile>? images,
+      List<String>? imagesIdDelete,
+      XFile? video}) async {
+    ApiResponse apiResponse = ApiResponse();
+    // Logger().d('edit_post: $postUrl/edit_post');
+
+    Dio dio = Dio();
+
+    // Tạo multipart form data
+    FormData formData = FormData();
+    try {
+      formData.fields.add(MapEntry("token", token));
+      formData.fields.add(MapEntry("id", postId.toString()));
+      if (described != null) {
+        formData.fields.add(MapEntry("described", described));
+      }
+      if (status != null) {
+        formData.fields.add(MapEntry("status", status));
+      }
+
+      if (images != null) {
+        for (var i = 0; i < images.length; i++) {
+          // Thêm hình ảnh vào form data
+          formData.files.add(
+            MapEntry(
+              "image",
+              MultipartFile.fromBytes(
+                await images[i].readAsBytes(),
+                filename: images[i].name,
+                contentType: MediaType('image', 'jpg|jpeg|png'),
+              ),
+            ),
+          );
+        }
+      }
+      if (video != null) {
+        // Thêm video vào form data
+        formData.files.add(
+          MapEntry(
+            "video",
+            MultipartFile.fromBytes(
+              await video.readAsBytes(),
+              filename: video.name,
+              contentType: MediaType('video', 'mp4'),
+            ),
+          ),
+        );
+      }
+      if (imagesIdDelete!.isNotEmpty) {
+        // conver sang json
+        String jsonImageDel = jsonEncode(imagesIdDelete);
+        formData.fields.add(MapEntry("image_del", jsonImageDel));
+      }
+
+      print('$postUrl/edit_post: ');
+
+      // Gửi dữ liệu lên backend
+      var response = await dio.post(
+        '$postUrl/edit_post',
+        options: Options(
+          validateStatus: (_) => true,
+          contentType: "multipart/form-data",
+          responseType: ResponseType.json,
+        ),
+        data: formData,
+      );
+      // Logger().d('response: ${response.statusCode} \n data: ${response.data} \n ');
+      apiResponse = ApiResponse.fromJson(response.data);
+      Logger().d('apiResponse edit_post: ${apiResponse.toJson()}');
+    } catch (e) {
+      print(e);
+      Logger().e(e);
+      apiResponse.message = serviceError;
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> deletePost(String id) async {
+    ApiResponse apiResponse = ApiResponse();
+    Dio dio = Dio();
+    FormData formData = FormData();
+    formData.fields.add(MapEntry("token", token));
+    formData.fields.add(MapEntry("id", id));
+    try {
+      final response = await dio.post(
+        '$postUrl/delete_post',
+        options: Options(
+          validateStatus: (_) => true,
+          contentType: "multipart/form-data",
+          responseType: ResponseType.json,
+        ),
+        data: formData,
+      );
+      apiResponse = ApiResponse.fromJson(response.data);
+      Logger().d('apiResponse delete_post: ${apiResponse.toJson()}');
+    } catch (e) {
+      print(e);
+      Logger().e(e);
+      apiResponse.message = serviceError;
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> reportPost(String id, String subject, String details) async {
+    ApiResponse apiResponse = ApiResponse();
+    Dio dio = Dio();
+    FormData formData = FormData();
+    formData.fields.add(MapEntry("token", token));
+    formData.fields.add(MapEntry("id", id));
+    formData.fields.add(MapEntry("subject", subject));
+    formData.fields.add(MapEntry("details", details));
+    try {
+      final response = await dio.post(
+        '$postUrl/delete_post',
+        options: Options(
+          validateStatus: (_) => true,
+          contentType: "multipart/form-data",
+          responseType: ResponseType.json,
+        ),
+        data: formData,
+      );
+      apiResponse = ApiResponse.fromJson(response.data);
+      Logger().d('apiResponse delete_post: ${apiResponse.toJson()}');
     } catch (e) {
       print(e);
       Logger().e(e);

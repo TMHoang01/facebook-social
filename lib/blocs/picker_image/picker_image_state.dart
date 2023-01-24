@@ -3,26 +3,40 @@ part of 'picker_image_bloc.dart';
 
 class PickerImageState extends Equatable {
   List<XFile>? images;
+  List<ImageModel>? oldImages;
   XFile? video;
-  String isError = '';
-  String get videoPath => video?.path ?? '';
+  VideoModel? oldVideo;
+  String? message;
   List<String> get imagesPath => images?.map((e) => e.path).toList() ?? [];
-  PickerImageState(
+  PickerImageState({
     this.images,
+    this.oldImages,
+    this.oldVideo,
     this.video,
-  );
-  factory PickerImageState.initial() => PickerImageState([], null);
+    this.message,
+  });
+  factory PickerImageState.initial() => PickerImageState();
+
+  factory PickerImageState.editPost(PostModel post) {
+    return PickerImageState(oldImages: post.image, oldVideo: post.video);
+  }
   @override
   // TODO: implement props
-  List<Object?> get props => [images, video];
+  List<Object?> get props => [images, video, message, oldImages, oldVideo];
 
   PickerImageState copyWith({
     List<XFile>? images,
     XFile? video,
+    String? message,
+    List<ImageModel>? oldImages,
+    VideoModel? oldVideo,
   }) {
     return PickerImageState(
-      images ?? this.images,
-      video ?? this.video,
+      images: images ?? this.images,
+      oldImages: oldImages ?? this.oldImages,
+      video: video ?? this.video,
+      oldVideo: oldVideo ?? this.oldVideo,
+      message: message,
     );
   }
 }

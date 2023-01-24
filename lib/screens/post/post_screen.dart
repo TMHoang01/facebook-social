@@ -5,6 +5,7 @@ import 'package:fb_copy/models/post_model.dart';
 import 'package:fb_copy/screens/loading_screen.dart';
 import 'package:fb_copy/screens/post/components/create_feed_widget.dart';
 import 'package:fb_copy/screens/post/components/post_widget.dart';
+import 'package:fb_copy/widgets/diaog_widget.dart';
 import 'package:fb_copy/widgets/diverder_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -39,7 +40,14 @@ class _PostScreenState extends State<PostScreen> {
       onRefresh: () async {
         _postBloc.add(LoadPostEvent(isRefresh: true));
       },
-      child: BlocBuilder<PostBloc, PostState>(
+      child: BlocConsumer<PostBloc, PostState>(
+        listener: (context, state) => {
+          if (state is PostExpiredTokenState)
+            {
+              dialogAlterBuilder(context, 'Thông báo', "Phiên đang nhập đã hết hạn, vui lòng đăng nhập lại"),
+              Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false)
+            }
+        },
         builder: (context, state) {
           List<PostModel> postList = state.listPosts;
           if (state is PostErrorState) {

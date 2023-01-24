@@ -1,3 +1,6 @@
+import 'package:fb_copy/screens/home/home_screen.dart';
+import 'package:fb_copy/screens/login/login_screen.dart';
+import 'package:fb_copy/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -5,9 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../blocs/auth/auth_bloc.dart';
 
 class AuthScreen extends StatefulWidget {
-  final SharedPreferences prefs;
-
-  AuthScreen({super.key, required this.prefs});
+  AuthScreen({super.key});
   @override
   State<AuthScreen> createState() => _AuthScreenState();
 }
@@ -15,24 +16,31 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
-    final authBloc = AuthenticationBloc(prefs: widget.prefs);
-    return BlocBuilder<AuthenticationBloc, AuthenticationState>(
+    // final authBloc = BlocProvider.of<AuthBloc>(context).add(AuthInitEvent());
+    return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
-        if (state is AuthenticationInitialState) {
+        if (state is AuthInitialState) {
           // Hiển thị giao diện chờ nếu chưa có thông tin người dùng
-          // return LoadingIndicator();
-        } else if (state is AuthenticationAuthenticatedState) {
-          // Hiển thị giao diện đăng nhập thành công với thông tin người dùng
-          // return UserInfo(user: state.user);
-        } else if (state is AuthenticationUnauthenticatedState) {
+          print('AuthInitialState AuthScreen');
+          return const SplashScreen();
+        } else if (state is AuthSuccessState) {
           // Hiển thị giao diện chưa đăng nhập
-          // return LoginForm();
+          print('AuthSuccessState AuthScreen');
+          return const HomeScreen();
+        } else if (state is UnAuthState) {
+          // Hiển thị giao diện chưa đăng nhập
+          print('UnAuthState AuthScreen');
+          return const LoginScreen();
+        } else if (state is AuthExpiredState) {
+          print('AuthExpiredState AuthScreen');
+          return const LoginScreen();
+        } else {
+          print('Auth else AuthScreen');
+          return const SplashScreen();
         }
-        return Container();
+
+        return const SplashScreen();
       },
     );
   }
 }
-
-// BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationLoginEvent(user: user));
-// BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationLogoutEvent());

@@ -25,10 +25,10 @@ class PostState extends Equatable {
 class PostInitialSate extends PostState {
   final List<PostModel> listPosts;
   PostInitialSate({required this.listPosts});
-
   @override
   List<Object> get props => [listPosts];
 
+  @override
   PostInitialSate copyWith({
     List<PostModel>? listPosts,
   }) {
@@ -39,9 +39,11 @@ class PostInitialSate extends PostState {
 }
 
 class PostLoadingState extends PostState {
+  @override
   final List<PostModel> listPosts;
   PostLoadingState({required this.listPosts});
 
+  @override
   PostLoadingState copyWith({
     List<PostModel>? listPosts,
   }) {
@@ -52,35 +54,71 @@ class PostLoadingState extends PostState {
 }
 
 class PostLoadedState extends PostState {
+  @override
   final List<PostModel> listPosts;
   String? message;
-  String? errror;
+  String? error;
   bool? isNotPost = false;
-  bool? findPostById = true;
+
   PostLoadedState({
     required this.listPosts,
     this.isNotPost,
-    this.findPostById,
     this.message,
-    this.errror,
+    this.error,
   });
 
+  @override
   PostLoadedState copyWith({
     List<PostModel>? listPosts,
     bool? isNotPost,
     bool? findPostById,
     String? message,
-    String? errror,
+    String? error,
   }) {
     return PostLoadedState(
       listPosts: listPosts ?? this.listPosts,
       isNotPost: isNotPost ?? this.isNotPost,
-      findPostById: findPostById ?? this.findPostById,
-      message: message ?? this.message,
-      errror: errror ?? this.errror,
+      message: message,
+      error: error,
     );
   }
 }
+
+class PostElementInListState extends PostState {
+  @override
+  final List<PostModel> listPosts;
+  String? message;
+  String? error;
+  @override
+  bool? isNotPost = false;
+  bool? findPostById = true;
+  PostElementInListState({
+    required this.listPosts,
+    this.isNotPost,
+    this.findPostById,
+    this.message,
+    this.error,
+  });
+
+  @override
+  PostElementInListState copyWith({
+    List<PostModel>? listPosts,
+    bool? isNotPost,
+    bool? findPostById,
+    String? message,
+    String? error,
+  }) {
+    return PostElementInListState(
+      listPosts: listPosts ?? this.listPosts,
+      isNotPost: isNotPost ?? this.isNotPost,
+      findPostById: findPostById ?? this.findPostById,
+      message: message,
+      error: error,
+    );
+  }
+}
+
+class PostExpiredTokenState extends PostState {}
 
 class PostErrorState extends PostState {
   final message;

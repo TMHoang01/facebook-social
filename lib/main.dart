@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:fb_copy/blocs/auth/auth_bloc.dart';
 import 'package:fb_copy/blocs/internet/internet_bloc.dart';
 import 'package:fb_copy/blocs/login/login_bloc.dart';
 import 'package:fb_copy/blocs/picker_image/picker_image_bloc.dart';
@@ -6,6 +7,7 @@ import 'package:fb_copy/blocs/post/post_bloc.dart';
 import 'package:fb_copy/repositories/auth_repository.dart';
 import 'package:fb_copy/repositories/post_repository.dart';
 import 'package:fb_copy/screens/home/home_screen.dart';
+import 'package:fb_copy/screens/login/auth_screen.dart';
 import 'package:fb_copy/screens/login/login_screen.dart';
 import 'package:fb_copy/screens/post/add_post_screen.dart';
 import 'package:fb_copy/screens/post/post_screen.dart';
@@ -42,10 +44,15 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => PostBloc(PostRepository()),
         ),
-        BlocProvider(create: (context) => PickerImageBloc(ImagePicker())),
+        BlocProvider(
+          create: (context) => PickerImageBloc(ImagePicker()),
+        ),
+        BlocProvider(
+          create: (context) => AuthBloc()..add(AuthInitEvent()),
+        ),
       ],
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Facebook',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,
@@ -56,12 +63,38 @@ class MyApp extends StatelessWidget {
           listener: (context, state) {
             // TODO: implement listener
             if (state is ConnectionInternetState) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  behavior: SnackBarBehavior.floating,
+                  margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                  content: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.wifi_outlined, size: 24.0, color: Colors.green),
+                      const SizedBox(width: 16.0),
+                      Text(state.message, style: const TextStyle(fontSize: 16.0)),
+                    ],
+                  ),
+                ),
+              );
             } else if (state is NotConnectionInternetState) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  behavior: SnackBarBehavior.floating,
+                  margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                  content: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.wifi_off_outlined, size: 24.0, color: Colors.white),
+                      const SizedBox(width: 16.0),
+                      Text(state.message, style: const TextStyle(fontSize: 16.0)),
+                    ],
+                  ),
+                ),
+              );
             }
           },
-          child: HomeScreen(),
+          child: AuthScreen(),
           // child: LoginScreen(),
         ),
       ),

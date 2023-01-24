@@ -1,6 +1,7 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:date_format/date_format.dart';
-import 'package:timeago/timeago.dart' as timeago;
 import 'package:intl/intl.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class PostModel {
   String? id;
@@ -15,7 +16,7 @@ class PostModel {
   String? isBlocked;
   String? canComment;
   String? canEdit;
-  String? state;
+  String? status;
   Author? author;
 
   PostModel(
@@ -31,14 +32,14 @@ class PostModel {
       this.isBlocked,
       this.canComment,
       this.canEdit,
-      this.state,
+      this.status,
       this.author});
 
   factory PostModel.fromJson(Map<String, dynamic> json) {
-    print(DateTime.fromMillisecondsSinceEpoch(int.parse(json['created'])));
+    // print(DateTime.fromMillisecondsSinceEpoch(int.parse(json['created'])));
     MyCustomMessages messages = MyCustomMessages();
     timeago.setLocaleMessages('vi', messages);
-
+    // print(json['author']);
     return PostModel(
       id: json['id'],
       image: json['image'] != null ? (json['image'] as List).map((i) => ImageModel.fromJson(i)).toList() : null,
@@ -52,7 +53,8 @@ class PostModel {
       isBlocked: json['is_blocked'],
       canComment: json['can_comment'],
       canEdit: json['can_edit'],
-      state: json['state'],
+      status: json['status'],
+      author: json['author'] != null ? Author.fromJson(json['author']) : null,
     );
   }
 
@@ -74,8 +76,42 @@ class PostModel {
     data['is_blocked'] = this.isBlocked;
     data['can_comment'] = this.canComment;
     data['can_edit'] = this.canEdit;
-    data['state'] = this.state;
+    data['status'] = this.status;
+    data['author'] = this.author;
     return data;
+  }
+
+  PostModel copyWith({
+    String? id,
+    List<ImageModel>? image,
+    VideoModel? video,
+    String? described,
+    String? created,
+    String? modified,
+    String? like,
+    String? comment,
+    String? isLiked,
+    String? isBlocked,
+    String? canComment,
+    String? canEdit,
+    String? status,
+    Author? author,
+  }) {
+    return PostModel(
+      id: id ?? this.id,
+      image: image ?? this.image,
+      video: video ?? this.video,
+      described: described ?? this.described,
+      created: created ?? this.created,
+      modified: modified ?? this.modified,
+      like: like ?? this.like,
+      comment: comment ?? this.comment,
+      isLiked: isLiked ?? this.isLiked,
+      isBlocked: isBlocked ?? this.isBlocked,
+      canComment: canComment ?? this.canComment,
+      canEdit: canEdit ?? this.canEdit,
+      status: status ?? this.status,
+    );
   }
 }
 
@@ -100,7 +136,7 @@ class ImageModel {
 
 class VideoModel {
   String? url;
-  Null? thumb;
+  String? thumb;
 
   VideoModel({this.url, this.thumb});
 
@@ -119,14 +155,14 @@ class VideoModel {
 
 class Author {
   String? id;
-  Null? username;
-  Null? avatar;
+  String? username;
+  String? avatar;
 
   Author({this.id, this.username, this.avatar});
 
   Author.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    username = json['username'];
+    username = json['username'] ?? json['name'];
     avatar = json['avatar'];
   }
 

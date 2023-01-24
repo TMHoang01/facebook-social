@@ -12,6 +12,7 @@ import 'package:fb_copy/repositories/api_repository.dart';
 import 'package:fb_copy/repositories/post_repository.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
+import 'package:scroll_date_picker/scroll_date_picker.dart';
 
 part 'post_event.dart';
 part 'post_state.dart';
@@ -26,14 +27,14 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     this.repo,
   ) : super(PostInitialSate(listPosts: [])) {
     on<LoadPostEvent>(_onLoadingPost);
-    on<AddPost>(_onAddTask);
-    on<UpdatePost>(_onUpdateTask);
-    on<DeletePost>(_onDeleteTask);
+    on<AddPost>(_onAddPost);
+    on<EditPost>(_onEditPost);
+    on<DeletePost>(_onDeletePost);
     on<GetPostByIdEvent>(_onGetPostById);
     // on<LoadMorePostEvent>(_onLoadMorePost);
   }
 
-  FutureOr<void> _onAddTask(AddPost event, Emitter<PostState> emit) async {
+  FutureOr<void> _onAddPost(AddPost event, Emitter<PostState> emit) async {
     List<PostModel> listPosts = state.listPosts ?? <PostModel>[];
 
     emit(PostLoadingState(listPosts: state.listPosts));
@@ -67,9 +68,48 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     // }
   }
 
-  FutureOr<void> _onUpdateTask(UpdatePost event, Emitter<PostState> emit) {}
+  FutureOr<void> _onEditPost(EditPost event, Emitter<PostState> emit) async {
+    final post = event.post;
 
-  FutureOr<void> _onDeleteTask(DeletePost event, Emitter<PostState> emit) {}
+    // List<PostModel> listPosts = List.from(state.listPosts)..remove(event.post);
+    // Logger().d('listImageIdDelete ${event.listImageIdDelete}');
+    try {
+      final ApiResponse response = await repo.editPost(
+        postId: event.post.id,
+        described: event.described == post.described ? null : event.described,
+        imagesIdDelete: event.listImageIdDelete,
+        images: event.images,
+        video: event.video,
+        status: event.status == post.status ? null : event.status,
+      );
+    } catch (e) {
+      Logger().d('error edit post $e');
+      emit(PostErrorState(message: e.toString()));
+    }
+  }
+
+  FutureOr<void> _onDeletePost(DeletePost event, Emitter<PostState> emit) async {
+    if (state is PostLoadedState) {
+      final post = event.post;
+      List<PostModel> listPosts = state.listPosts;
+      try {
+        final ApiResponse response = await repo.deletePost(post.id.toString());
+        if (response.code == '1000') {
+          List<PostModel> listPosts = List.from(state.listPosts)..remove(event.post);
+        } else {
+          //
+        }
+        emit(PostLoadedState(listPosts: listPosts));
+      } catch (e) {
+        Logger().d('error delete post $e');
+        emit(PostLoadedState(listPosts: listPosts, message: e.toString()));
+      }
+    }
+
+    // List<PostModel> listPosts = List.from(state.listPosts)..remove(event.post);
+    // post.isDeleted == false ? listPosts.add(post.copyWith(isDeleted: true)) : listPosts.add(post.copyWith(isDeleted: false));
+    // emit(PostLoadingState(listPosts: listPosts));
+  }
 
   FutureOr<void> _onLoadingPost(LoadPostEvent event, Emitter<PostState> emit) async {
     if (event.isNotPost == true) {
@@ -84,11 +124,11 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       item = 1;
       listPosts = <PostModel>[];
     }
-    print('listPosts: ${listPosts.length}');
+    // print('listPosts: ${listPosts.length}');
     emit(PostLoadingState(listPosts: listPosts));
     try {
-      Logger().d(
-          'lastId: $lastId length pre state: ${listPosts.length} limit: $limitLoadPost  isNotPost: ${event.isNotPost}');
+      // Logger().d(
+      // 'lastId: $lastId length pre state: ${listPosts.length} limit: $limitLoadPost  isNotPost: ${event.isNotPost}');
 
       final ApiResponse response = await repo.getListPosts(lastId, listPosts.length, limitLoadPost, item++);
       Logger().d(response.code);
@@ -105,11 +145,13 @@ class PostBloc extends Bloc<PostEvent, PostState> {
           emit(PostErrorState(message: 'Có lỗi xảy ra vui lòng thử lại sau'));
         }
 
-        Logger().d('legth new state post ${listPosts.length}  item $item ');
+        // Logger().d('legth new state post ${listPosts.length}  item $item ');
         emit(PostLoadedState(listPosts: listPosts));
       } else if (response.code == '9994') {
-        print('code 9994 :' + item.toString() + ' ' + listPosts.length.toString());
+        print('code 9994: no more posst ' + item.toString() + ' ' + listPosts.length.toString());
         emit(PostLoadedState(listPosts: listPosts, isNotPost: true));
+      } else if (response.code == '9998') {
+        emit(PostExpiredTokenState());
       } else {
         print('not code 1000: ' + response.toString());
         emit(PostErrorState(message: response.message));
@@ -121,21 +163,32 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   }
 
   FutureOr<PostModel> _onGetPostById(GetPostByIdEvent event, Emitter<PostState> emit) {
-    if (this.state is LoadPostEvent) {
-      List<PostModel> listPosts = state.listPosts ?? <PostModel>[];
+    print('_onGetPostById event id: ${event.id}');
+    // if (this.state is LoadPostEvent) {
+    List<PostModel> listPosts = state.listPosts ?? <PostModel>[];
 
-      try {
-        repo.getPostById(event.id).then((ApiResponse response) {
+    try {
+      repo.getPost(event.id).then(
+        (ApiResponse response) {
+          print('_onGetPostById response code: ${response.code} response message: ${response.message}');
           if (response.code == '1000') {
             final Map<String, dynamic> data = response.data ?? <String, dynamic>{};
             final PostModel post = PostModel.fromJson(data);
             return post;
-          } else {}
-        });
-      } catch (e) {
-        emit(PostLoadedState(listPosts: listPosts, findPostById: false));
-      }
+          } else if (response.code == '9992') {
+            final message = response.message;
+            emit(PostElementInListState(listPosts: listPosts, findPostById: false, message: message));
+          } else if (response.code == '9998') {
+            emit(PostErrorState(message: response.message));
+          } else {
+            emit(PostErrorState(message: response.message));
+          }
+        },
+      );
+    } catch (e) {
+      emit(PostElementInListState(listPosts: listPosts, findPostById: false));
     }
+    // }
     return PostModel();
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
+import 'package:fb_copy/constants.dart';
 import 'package:fb_copy/models/auth_model.dart';
 import 'package:fb_copy/repositories/api_repository.dart';
 import 'package:fb_copy/repositories/auth_repository.dart';
@@ -19,19 +20,15 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       emit(LoginLoadingState());
       try {
         final ApiResponse response = await repo.login(event.phone, event.password);
-        print('asass ' +
-            response.data.toString() +
-            ' ' +
-            (response.code).toString() +
-            ' ' +
-            (response.code == '1000').toString());
         if (response.code == '1000') {
           // Map<String, dynamic> data = json.decode(response.data);
 
           AuthModel user = AuthModel.fromJson(response.data as Map<String, dynamic>);
-          Logger().i(user.toJson());
+          // Logger().i(user.toJson());
           SharedPreferences pref = await SharedPreferences.getInstance();
-          pref.setString('token', user.token ??= '');
+          pref.setString('authUser', json.encode(user.toJson()));
+          Logger().d(pref.getString('authUser'));
+          token = user.token!;
           // pref.setString('user_logig', user.toJson().toString());
           emit(LoginSuccessState());
         } else if (response.code == '9995' || response.code == '1004') {

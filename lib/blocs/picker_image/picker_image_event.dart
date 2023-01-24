@@ -9,6 +9,12 @@ abstract class PickerImageEvent extends Equatable {
 
 class PickerImageInitEvent extends PickerImageEvent {}
 
+class PickerImageEditPostEvent extends PickerImageEvent {
+  final PostModel post;
+
+  PickerImageEditPostEvent(this.post);
+}
+
 class onSelectMultipleImageEvent extends PickerImageEvent {
 //   final List<XFile> images;
 //   onSelectMultipleImageEvent(this.images);
@@ -17,9 +23,9 @@ class onSelectMultipleImageEvent extends PickerImageEvent {
 }
 
 class onRemoveImageEvent extends PickerImageEvent {
-  XFile image;
-
-  onRemoveImageEvent(this.image);
+  XFile? image;
+  ImageModel? oldImage;
+  onRemoveImageEvent({this.image, this.oldImage});
 }
 
 class onSelevtVideoEvent extends PickerImageEvent {}

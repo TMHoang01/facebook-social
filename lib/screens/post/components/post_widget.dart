@@ -1,9 +1,18 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fb_copy/blocs/internet/internet_bloc.dart';
+import 'package:fb_copy/blocs/post/post_bloc.dart';
 import 'package:fb_copy/constants.dart';
+import 'package:fb_copy/screens/post/edit_post_screen.dart';
+import 'package:fb_copy/screens/web_view.dart';
+import 'package:fb_copy/widgets/bottomsheet_widget.dart';
+import 'package:fb_copy/widgets/diaog_widget.dart';
 import 'package:flutter/material.dart';
 
 import 'package:fb_copy/models/post_model.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PostWidget extends StatelessWidget {
   final PostModel post;
@@ -15,6 +24,7 @@ class PostWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    InternetBloc internetBloc = BlocProvider.of<InternetBloc>(context);
     return Container(
       width: double.infinity,
       // height: 300.0,
@@ -22,27 +32,141 @@ class PostWidget extends StatelessWidget {
       child: Column(
         children: <Widget>[
           Row(
-            children: <Widget>[
-              CircleAvatar(
-                backgroundImage: AssetImage('assets/images/avatar_default.png'),
-                radius: 20.0,
-              ),
-              SizedBox(width: 7.0),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
                 children: <Widget>[
-                  Text('${post.author ?? 'Người dùng'}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0)),
-                  SizedBox(height: 5.0),
-                  Text('${post.created}')
+                  const CircleAvatar(
+                    backgroundImage: AssetImage('assets/images/avatar_default.png'),
+                    radius: 20.0,
+                  ),
+                  const SizedBox(width: 7.0),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text('${post.author?.username ?? 'Người dùng fb'}',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0)),
+                      const SizedBox(height: 5.0),
+                      Text(post.created ?? 'vừa mới đây')
+                    ],
+                  ),
                 ],
+              ),
+              IconButton(
+                icon: Icon(Icons.more_horiz),
+                onPressed: () {
+                  print('id: ${post.id} author name: ${post.author?.username}');
+                  showModal(
+                    context,
+                    1 == 1
+                        ? [
+                            ListTile(
+                              leading: Icon(Icons.edit),
+                              title: Text('Sửa bài viết'),
+                              onTap: () {
+                                Navigator.of(context).pop();
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EditPostScreen(
+                                      post: post,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            ListTile(
+                              leading: Icon(Icons.delete),
+                              title: Text('Xóa bài viết'),
+                              onTap: () => {
+                                Navigator.of(context).pop(),
+                                dialogConfirmBuilder(
+                                  context,
+                                  'Xác nhận xóa bài viết',
+                                  'Bạn có chắc chắn muốn xóa bài viết này không?',
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      TextButton(
+                                        child: Text('Hủy'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                      TextButton(
+                                        child: Text('Xóa'),
+                                        onPressed: () {
+                                          // Gọi hàm xóa bài viết tại đây
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                  () {},
+                                ),
+                              },
+                            ),
+                            ListTile(
+                              leading: Icon(Icons.report),
+                              title: Text('Báo cáo bài viết'),
+                              onTap: () => {
+                                Navigator.of(context).pop(),
+                                showModalFullSheet(
+                                  context,
+                                  [
+                                    ListTile(
+                                      leading: Icon(Icons.delete),
+                                      title: Text('Xóa bài viết'),
+                                      onTap: () => print('xóa bài viết'),
+                                    ),
+                                  ],
+                                )
+                              },
+                            ),
+                          ]
+                        : [
+                            ListTile(
+                              leading: Icon(Icons.report),
+                              title: Text('Báo cáo bài viết'),
+                              onTap: () => {
+                                showModalFullSheet(
+                                  context,
+                                  [
+                                    ListTile(
+                                      leading: Icon(Icons.delete),
+                                      title: Text('Xóa bài viết'),
+                                      onTap: () => print('xóa bài viết'),
+                                    ),
+                                  ],
+                                )
+                              },
+                            ),
+                          ],
+                  );
+                },
               ),
             ],
           ),
           const SizedBox(height: 20.0),
-          Text(post.described ?? '', style: TextStyle(fontSize: 15.0)),
+          // Text(post.described ?? '', style: TextStyle(fontSize: 15.0)),
+          SelectableLinkify(
+            onOpen: (link) async {
+              try {
+                if (await canLaunchUrl(Uri.parse(link.url))) {
+                  await launchUrl(Uri.parse(link.url));
+                } else {
+                  throw 'Could not launch $link';
+                }
+              } catch (e) {}
+            },
+            text: post.described ?? '',
+            style: const TextStyle(fontSize: 15.0),
+            linkStyle: const TextStyle(color: Colors.blue),
+          ),
           const SizedBox(height: 10.0),
-          post.image?.isNotEmpty == true && post.image![0] != null
+          post.image?.isNotEmpty == true
               ? InkWell(
                   onTap: () => {},
                   child: Padding(
@@ -50,7 +174,8 @@ class PostWidget extends StatelessWidget {
                     child: SizedBox(
                       child: CachedNetworkImage(
                         imageUrl: post.image![0].url.toString(),
-                        maxHeightDiskCache: 300,
+                        height: 350,
+                        width: MediaQuery.of(context).size.width,
                         fit: BoxFit.cover,
                         placeholder: (context, url) => SizedBox(
                           child: Container(
@@ -58,8 +183,8 @@ class PostWidget extends StatelessWidget {
                             height: 40,
                             width: 40,
                           ),
-                          width: MediaQuery.of(context).size.width,
-                          height: 300,
+                          // width: MediaQuery.of(context).size.width,
+                          // height: 300,
                         ),
                         errorWidget: (context, url, error) => SizedBox(
                           child: Container(
@@ -69,8 +194,8 @@ class PostWidget extends StatelessWidget {
                             ),
                             color: AppColor.grayColor,
                           ),
-                          width: MediaQuery.of(context).size.width,
-                          height: 300,
+                          // width: MediaQuery.of(context).size.width,
+                          // height: 300,
                         ),
                       ),
                     ),
@@ -82,13 +207,13 @@ class PostWidget extends StatelessWidget {
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  Icon(Icons.thumb_up_alt_outlined, size: 15.0, color: Colors.blue),
-                  Text(' ${post.like}'),
+                  const Icon(Icons.thumb_up_alt_outlined, size: 15.0, color: Colors.blue),
+                  Text(' ${post.like ?? 0}'),
                 ],
               ),
               Row(
                 children: <Widget>[
-                  Text('${post.comment} bình luận'),
+                  Text('${post.comment ?? 0} bình luận'),
                 ],
               ),
             ],

@@ -31,9 +31,32 @@ class AddPost extends PostEvent {
   });
 }
 
-class UpdatePost extends PostEvent {
+// ignore: must_be_immutable
+class EditPost extends PostEvent {
   final PostModel post;
-  UpdatePost({required this.post});
+  String? described;
+  List<XFile>? images;
+  List<ImageModel>? imageDelete;
+  XFile? video;
+  String? status;
+  EditPost({
+    required this.post,
+    this.described,
+    this.images,
+    this.imageDelete,
+    this.video,
+    this.status,
+  });
+
+  List<String> get listImageIdDelete {
+    List<String> list = [];
+    if (imageDelete != null) {
+      for (final ImageModel image in imageDelete!) {
+        list.add(image.id.toString());
+      }
+    }
+    return list;
+  }
 
   @override
   List<Object> get props => [post];
@@ -48,10 +71,10 @@ class DeletePost extends PostEvent {
 }
 
 class LoadMorePostEvent extends PostEvent {
-  final String last_id;
+  final String lastId;
   final int index;
   final int count;
-  LoadMorePostEvent({required this.last_id, required this.index, required this.count});
+  LoadMorePostEvent({required this.lastId, required this.index, required this.count});
 }
 
 class GetPostByIdEvent extends PostEvent {
