@@ -3,18 +3,18 @@ import 'package:fb_copy/models/post_model.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 
-class PostDetails extends StatefulWidget {
+class PostDetailScreen extends StatefulWidget {
   PostModel post;
-  PostDetails({
+  PostDetailScreen({
     Key? key,
     required this.post,
   }) : super(key: key);
 
   @override
-  State<PostDetails> createState() => _PostDetailsState();
+  State<PostDetailScreen> createState() => _PostDetailScreenState();
 }
 
-class _PostDetailsState extends State<PostDetails> {
+class _PostDetailScreenState extends State<PostDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return const Placeholder();

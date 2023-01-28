@@ -25,7 +25,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           if (_prefs.containsKey('authUser')) {
             Logger().d(_prefs.getString('authUser'));
             authUser = AuthModel.fromJson(json.decode(_prefs.getString('authUser')!));
-            // token = authUser!.token!;
+            token = authUser!.token!;
 
             AuthRepository repository = AuthRepository();
             add(AuthCheckExpiredEvent());

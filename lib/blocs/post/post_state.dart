@@ -68,6 +68,9 @@ class PostLoadedState extends PostState {
   });
 
   @override
+  List<Object> get props => [listPosts];
+
+  @override
   PostLoadedState copyWith({
     List<PostModel>? listPosts,
     bool? isNotPost,

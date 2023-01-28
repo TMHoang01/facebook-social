@@ -4,21 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const host = '192.168.1.55';
+const host = '192.168.1.63';
 const baseUrl = "http://$host:5000/it4788";
 const authUrl = '$baseUrl/auth';
 const friendUrl = '$baseUrl/friend';
 const postUrl = '$baseUrl/post';
 const userUrl = '$baseUrl/user';
-const sreachUrl = '$baseUrl/search';
+const searchUrl = '$baseUrl/search';
 const commentUrl = '$baseUrl/comment';
 const likeUrl = '$baseUrl/like';
 const settingUrl = '$baseUrl/setting';
 const chatUrl = '$baseUrl/chat';
 
 AuthModel? authUser;
-String token =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzOGMxYjg1ZWUzM2FiMWZiNDI3NDE0NyIsImRhdGVMb2dpbiI6IjIwMjMtMDEtMjJUMTY6MDk6MzUuMjgyWiIsImlhdCI6MTY3NDQwMzc3NSwiZXhwIjoxNjc0NDkwMTc1fQ.FESUmlt6VUk0jNavtzDL0CJZYLlWpWBJJLgIN-17VyU';
+String token = '';
 List<PostModel> listPost = [];
 
 Future<void> checkToken() async {

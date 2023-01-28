@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fb_copy/constants.dart';
@@ -10,6 +11,7 @@ import 'package:fb_copy/constants.dart';
 import 'package:fb_copy/models/post_model.dart';
 import 'package:fb_copy/repositories/api_repository.dart';
 import 'package:fb_copy/repositories/post_repository.dart';
+import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import 'package:scroll_date_picker/scroll_date_picker.dart';
@@ -31,7 +33,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     on<EditPost>(_onEditPost);
     on<DeletePost>(_onDeletePost);
     on<GetPostByIdEvent>(_onGetPostById);
-    // on<LoadMorePostEvent>(_onLoadMorePost);
+    on<LikePostEvent>(_onLikePost);
   }
 
   FutureOr<void> _onAddPost(AddPost event, Emitter<PostState> emit) async {
@@ -39,33 +41,46 @@ class PostBloc extends Bloc<PostEvent, PostState> {
 
     emit(PostLoadingState(listPosts: state.listPosts));
 
-    Logger()
-        .d('add post ${state.listPosts.length}  \n add post : ${event.described} \n ${event.images} \n ${event.video}');
+    try {
+      final ApiResponse response = await repo.addPost(event.described, event.images, event.video, event.status);
+      if (response.code == '1000') {
+        final Map<String, dynamic> data = response.data ?? <String, dynamic>{};
+        final String idNewPost = data['id'] ?? '';
+        if (idNewPost.isEmpty) {
+          emit(PostErrorState(message: 'Không thể thêm bài viết'));
+          return;
+        }
 
-    // try {
-    final ApiResponse response = await repo.addPost(event.described, event.images, event.video, event.status);
-    if (response.code == '1000') {
-      final Map<String, dynamic> data = response.data ?? <String, dynamic>{};
-      final String idNewPost = data['id'] ?? '';
-      if (idNewPost.isEmpty) {
-        emit(PostErrorState(message: 'Không thể thêm bài viết'));
-        return;
+        PostModel postRaw = PostModel(
+          id: idNewPost,
+          described: event.described,
+        );
+
+        PostModel postServer = await _onGetPostById(GetPostByIdEvent(id: idNewPost), emit);
+        // add postRaw in postServer if postServer is not null
+        if (postServer.id != null) {
+          postRaw = postServer.copyWith(
+            image: postServer.image,
+            video: postServer.video,
+            status: postServer.status,
+            created: postServer.created,
+            modified: postServer.modified,
+            author: postServer.author,
+          );
+        }
+        Logger().d(postRaw.toJson());
+        Logger().d(postServer.toJson());
+        String message = 'Thêm bài viết thành công';
+        final List<PostModel> listPosts = state.listPosts ?? [];
+        listPosts.insert(0, postServer);
+        emit(PostLoadedState(listPosts: listPosts, message: message));
+      } else {
+        emit(PostErrorState(message: response.message));
       }
-      // add event get post by id
-      add(GetPostByIdEvent(id: idNewPost));
-      PostModel post = PostModel(
-        id: idNewPost,
-        described: event.described,
-      );
-      final List<PostModel> listPosts = state.listPosts ?? [];
-      listPosts.insert(0, post);
-      emit(PostLoadedState(listPosts: listPosts));
-    } else {
-      emit(PostErrorState(message: response.message));
+    } catch (e) {
+      Logger().d('error add post $e');
+      emit(PostLoadedState(listPosts: listPosts, error: 'Kết nối server bị lỗi, vui lòng kiểm tra lại'));
     }
-    // } catch (e) {
-    //   emit(PostErrorState(message: e.toString()));
-    // }
   }
 
   FutureOr<void> _onEditPost(EditPost event, Emitter<PostState> emit) async {
@@ -82,6 +97,19 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         video: event.video,
         status: event.status == post.status ? null : event.status,
       );
+
+      if (response.code == '1000') {
+        String message = 'Sửa bài viết thành công';
+        final List<PostModel> listPosts = state.listPosts ?? [];
+
+        final postEdit = await _onGetPostById(GetPostByIdEvent(id: post.id.toString()), emit);
+        final index = listPosts.indexWhere((element) => element.id == post.id);
+        listPosts[index] = postEdit;
+
+        emit(PostLoadedState(listPosts: listPosts, message: message));
+      } else {
+        emit(PostErrorState(message: response.message));
+      }
     } catch (e) {
       Logger().d('error edit post $e');
       emit(PostErrorState(message: e.toString()));
@@ -93,16 +121,23 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       final post = event.post;
       List<PostModel> listPosts = state.listPosts;
       try {
+        String message = 'Xóa bài viết thành công';
         final ApiResponse response = await repo.deletePost(post.id.toString());
+        print(" _onDeletePost :" + response.toJson().toString());
         if (response.code == '1000') {
-          List<PostModel> listPosts = List.from(state.listPosts)..remove(event.post);
+          Logger().d(listPosts.length.toString());
+          // List<PostModel> listPosts = List.from(state.listPosts)..remove(post);
+          listPosts = listPosts.where((element) => element.id != post.id).toList();
+          emit(PostLoadedState(listPosts: listPosts, message: message));
         } else {
-          //
+          print(" _onDeletePost code != 1000 :" + response.toJson().toString());
+          listPosts = List.from(listPosts);
+          message = 'Có lỗi xảy ra. Xóa bài không thành công';
+          emit(PostLoadedState(listPosts: listPosts, message: message));
         }
-        emit(PostLoadedState(listPosts: listPosts));
       } catch (e) {
         Logger().d('error delete post $e');
-        emit(PostLoadedState(listPosts: listPosts, message: e.toString()));
+        emit(PostLoadedState(listPosts: listPosts, error: 'Kết nối server bị lỗi, không thể xóa bài viết'));
       }
     }
 
@@ -162,34 +197,64 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     }
   }
 
-  FutureOr<PostModel> _onGetPostById(GetPostByIdEvent event, Emitter<PostState> emit) {
+  FutureOr<PostModel> _onGetPostById(GetPostByIdEvent event, Emitter<PostState> emit) async {
     print('_onGetPostById event id: ${event.id}');
     // if (this.state is LoadPostEvent) {
     List<PostModel> listPosts = state.listPosts ?? <PostModel>[];
 
     try {
-      repo.getPost(event.id).then(
-        (ApiResponse response) {
-          print('_onGetPostById response code: ${response.code} response message: ${response.message}');
-          if (response.code == '1000') {
-            final Map<String, dynamic> data = response.data ?? <String, dynamic>{};
-            final PostModel post = PostModel.fromJson(data);
-            return post;
-          } else if (response.code == '9992') {
-            final message = response.message;
-            emit(PostElementInListState(listPosts: listPosts, findPostById: false, message: message));
-          } else if (response.code == '9998') {
-            emit(PostErrorState(message: response.message));
-          } else {
-            emit(PostErrorState(message: response.message));
-          }
-        },
-      );
+      ApiResponse response = await repo.getPost(event.id);
+      if (response.code == '1000') {
+        final post = PostModel.fromJson(response.data as Map<String, dynamic>);
+        if (listPosts.any((element) => element.id == post.id)) {
+          listPosts = listPosts.map((e) => e.id == post.id ? post : e).toList();
+        }
+        emit(PostLoadedState(listPosts: listPosts));
+        // emit(PostElementInListState(listPosts: listPosts, findPostById: true));
+        return post;
+      } else if (response.code == '9998') {
+        emit(PostExpiredTokenState());
+      } else {
+        emit(PostLoadedState(listPosts: listPosts, message: response.message));
+      }
     } catch (e) {
-      emit(PostElementInListState(listPosts: listPosts, findPostById: false));
+      emit(PostElementInListState(listPosts: listPosts, findPostById: false, message: 'Server Error'));
     }
     // }
+    print('_onGetPostById return PostModel(null)');
     return PostModel();
+  }
+
+  FutureOr<void> _onLikePost(LikePostEvent event, Emitter<PostState> emit) async {
+    try {
+      if (state is PostLoadedState) {
+        final post = event.post;
+        List<PostModel> listPosts = state.listPosts;
+        emit(PostLoadingState(listPosts: listPosts));
+        ApiResponse response = await repo.likePost(post.id.toString());
+        if (response.code == '1000') {
+          Logger().d('like post success ${response.data}');
+          String like = response.data['like'];
+          String isLike = post.isLiked == "1" ? '0' : '1';
+          listPosts = listPosts
+              .map((e) => e.id == post.id
+                  ? post.copyWith(
+                      isLiked: isLike,
+                      like: like,
+                    )
+                  : e)
+              .toList();
+          emit(PostLoadedState(listPosts: listPosts));
+        } else if (response.code == '9998') {
+          emit(PostExpiredTokenState());
+        } else {
+          emit(PostLoadedState(listPosts: listPosts, message: response.message));
+        }
+      }
+    } catch (e) {
+      emit(PostLoadedState(listPosts: state.listPosts));
+      Logger().d('error like post $e');
+    }
   }
 }
 

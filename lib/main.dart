@@ -57,7 +57,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        // onGenerateRoute: appRouter.generateRoute,
+        onGenerateRoute: appRouter.generateRoute,
         home: BlocListener<InternetBloc, InternetState>(
           listenWhen: (previous, current) => (previous is! InternetInitialState),
           listener: (context, state) {

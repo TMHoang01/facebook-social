@@ -1,18 +1,24 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import 'package:fb_copy/blocs/internet/internet_bloc.dart';
 import 'package:fb_copy/blocs/post/post_bloc.dart';
 import 'package:fb_copy/constants.dart';
+import 'package:fb_copy/models/post_model.dart';
+import 'package:fb_copy/screens/comment/comment_screen.dart';
+import 'package:fb_copy/screens/post/components/post_button.dart';
+import 'package:fb_copy/screens/post/components/images_widget.dart';
 import 'package:fb_copy/screens/post/edit_post_screen.dart';
+import 'package:fb_copy/screens/post/post_details_screen.dart';
 import 'package:fb_copy/screens/web_view.dart';
 import 'package:fb_copy/widgets/bottomsheet_widget.dart';
 import 'package:fb_copy/widgets/diaog_widget.dart';
-import 'package:flutter/material.dart';
-
-import 'package:fb_copy/models/post_model.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class PostWidget extends StatelessWidget {
   final PostModel post;
@@ -25,11 +31,13 @@ class PostWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     InternetBloc internetBloc = BlocProvider.of<InternetBloc>(context);
+    PostBloc postBloc = BlocProvider.of<PostBloc>(context);
     return Container(
       width: double.infinity,
       // height: 300.0,
-      padding: EdgeInsets.all(15.0),
+      padding: EdgeInsets.only(top: 10.0, left: 10.0, right: 10.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -56,10 +64,10 @@ class PostWidget extends StatelessWidget {
               IconButton(
                 icon: Icon(Icons.more_horiz),
                 onPressed: () {
-                  print('id: ${post.id} author name: ${post.author?.username}');
+                  print('id: ${post.id} author name: ${authUser!.id} author id: ${post.author?.id}');
                   showModal(
                     context,
-                    1 == 1
+                    authUser!.id == post.author?.id
                         ? [
                             ListTile(
                               leading: Icon(Icons.edit),
@@ -98,8 +106,25 @@ class PostWidget extends StatelessWidget {
                                       TextButton(
                                         child: Text('Xóa'),
                                         onPressed: () {
-                                          // Gọi hàm xóa bài viết tại đây
-                                          Navigator.of(context).pop();
+                                          // check internetBloc state is connected
+                                          if (internetBloc.state is ConnectInternetEvent) {
+                                            print('delete post internetBloc.state is ConnectInternetEvent');
+                                            // Gọi hàm xóa bài viết tại đây
+                                            Navigator.of(context).pop();
+                                            BlocProvider.of<PostBloc>(context).add(DeletePost(post: post));
+                                          } else {
+                                            print('delete post internetBloc.state is NotConnectInternetEvent');
+
+                                            // Navigator.of(context).pop();
+                                            // snack
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                    'Chúng tôi hiện không thể thực hiện thao tác này. Vui lòng kiểm tra lại kết nối mạng của bạn!'),
+                                                duration: Duration(seconds: 2),
+                                              ),
+                                            );
+                                          }
                                         },
                                       ),
                                     ],
@@ -108,39 +133,22 @@ class PostWidget extends StatelessWidget {
                                 ),
                               },
                             ),
-                            ListTile(
-                              leading: Icon(Icons.report),
-                              title: Text('Báo cáo bài viết'),
-                              onTap: () => {
-                                Navigator.of(context).pop(),
-                                showModalFullSheet(
-                                  context,
-                                  [
-                                    ListTile(
-                                      leading: Icon(Icons.delete),
-                                      title: Text('Xóa bài viết'),
-                                      onTap: () => print('xóa bài viết'),
-                                    ),
-                                  ],
-                                )
-                              },
-                            ),
                           ]
                         : [
                             ListTile(
                               leading: Icon(Icons.report),
                               title: Text('Báo cáo bài viết'),
                               onTap: () => {
-                                showModalFullSheet(
-                                  context,
-                                  [
-                                    ListTile(
-                                      leading: Icon(Icons.delete),
-                                      title: Text('Xóa bài viết'),
-                                      onTap: () => print('xóa bài viết'),
-                                    ),
-                                  ],
-                                )
+                                // showModalFullSheet(
+                                //   context,
+                                //   [
+                                //     ListTile(
+                                //       leading: Icon(Icons.delete),
+                                //       title: Text('Xóa bài viết'),
+                                //       onTap: () => print('xóa bài viết'),
+                                //     ),
+                                //   ],
+                                // )
                               },
                             ),
                           ],
@@ -151,64 +159,73 @@ class PostWidget extends StatelessWidget {
           ),
           const SizedBox(height: 20.0),
           // Text(post.described ?? '', style: TextStyle(fontSize: 15.0)),
-          SelectableLinkify(
-            onOpen: (link) async {
-              try {
-                if (await canLaunchUrl(Uri.parse(link.url))) {
-                  await launchUrl(Uri.parse(link.url));
-                } else {
-                  throw 'Could not launch $link';
-                }
-              } catch (e) {}
-            },
-            text: post.described ?? '',
-            style: const TextStyle(fontSize: 15.0),
-            linkStyle: const TextStyle(color: Colors.blue),
-          ),
-          const SizedBox(height: 10.0),
-          post.image?.isNotEmpty == true
-              ? InkWell(
-                  onTap: () => {},
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: SizedBox(
-                      child: CachedNetworkImage(
-                        imageUrl: post.image![0].url.toString(),
-                        height: 350,
-                        width: MediaQuery.of(context).size.width,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => SizedBox(
-                          child: Container(
-                            color: AppColor.grayColor,
-                            height: 40,
-                            width: 40,
-                          ),
-                          // width: MediaQuery.of(context).size.width,
-                          // height: 300,
-                        ),
-                        errorWidget: (context, url, error) => SizedBox(
-                          child: Container(
-                            child: Icon(
-                              Icons.error,
-                              size: 40,
-                            ),
-                            color: AppColor.grayColor,
-                          ),
-                          // width: MediaQuery.of(context).size.width,
-                          // height: 300,
-                        ),
-                      ),
+          SizedBox(
+            width: double.infinity,
+            child: InkWell(
+              // width: double.infinity,
+              onLongPress: () {
+                Clipboard.setData(ClipboardData(text: post.described));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Đã copy văn bản vào bộ nhớ tạm'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              },
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PostDetailScreen(
+                      post: post,
                     ),
                   ),
-                )
-              : Container(),
+                );
+              },
+              child: Linkify(
+                onOpen: (link) async {
+                  try {
+                    if (await canLaunchUrl(Uri.parse(link.url))) {
+                      await launchUrl(Uri.parse(link.url));
+                    } else {
+                      throw 'Could not launch $link';
+                    }
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Không thể mở liên kết này'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                },
+                text: (post.described ?? ''),
+                style: const TextStyle(fontSize: 18.0, color: Colors.black, height: 1.5),
+                linkStyle: const TextStyle(color: Colors.blue),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10.0),
+          ImagesPost(post: post),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  const Icon(Icons.thumb_up_alt_outlined, size: 15.0, color: Colors.blue),
-                  Text(' ${post.like ?? 0}'),
+                  Container(
+                    padding: const EdgeInsets.all(4.0),
+                    decoration: const BoxDecoration(
+                      color: AppColor.kPrimaryColor,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.thumb_up,
+                      size: 10.0,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                      ' ${(post.like == "1" && post.isLiked == "1") ? authUser!.username : (int.parse(post.like!) < 100 && post.isLiked == "1") ? "Bạn và ${int.parse(post.like!) - 1} người khác" : post.like}'),
                 ],
               ),
               Row(
@@ -218,32 +235,61 @@ class PostWidget extends StatelessWidget {
               ),
             ],
           ),
-          const Divider(height: 30.0),
+          const Divider(height: 4.0),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.center,
+            // textDirection: TextDirection.ltr,
             children: <Widget>[
-              Row(
-                children: const <Widget>[
-                  Icon(Icons.thumb_up_alt_outlined, size: 20.0),
-                  SizedBox(width: 5.0),
-                  Text('Like', style: TextStyle(fontSize: 14.0)),
-                ],
+              PostButton(
+                icon: post.isLiked == "1"
+                    ? const Icon(
+                        Icons.thumb_up,
+                        color: AppColor.kPrimaryColor,
+                        size: 24.0,
+                      )
+                    : const Icon(
+                        MdiIcons.thumbUpOutline,
+                        color: AppColor.kColorButton,
+                        size: 24.0,
+                      ),
+                label: Text(
+                  textAlign: TextAlign.center,
+                  'Thích',
+                  style: TextStyle(
+                      color: post.isLiked == "1" ? AppColor.kPrimaryColor : AppColor.kColorTextNormal, fontSize: 16.0),
+                ),
+                onTap: () {
+                  postBloc.add(LikePostEvent(post: post));
+                },
               ),
-              Row(
-                children: const <Widget>[
-                  Icon(Icons.message_rounded, size: 20.0),
-                  SizedBox(width: 5.0),
-                  Text('Comment', style: TextStyle(fontSize: 14.0)),
-                ],
-              ),
-              Row(
-                children: const <Widget>[
-                  Icon(Icons.shape_line_outlined, size: 20.0),
-                  SizedBox(width: 5.0),
-                  Text('Share', style: TextStyle(fontSize: 14.0)),
-                ],
-              ),
+              PostButton(
+                  icon: const Icon(
+                    MdiIcons.commentOutline,
+                    color: AppColor.kColorButton,
+                    size: 20.0,
+                  ),
+                  label: const Text('Bình luận'),
+                  onTap: () {
+                    // Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    //   return CommentScreen(
+                    //     post: post,
+                    //   );
+                    // }));
+                    showModalFullSheet(
+                      context,
+                      [
+                        WillPopScope(
+                          onWillPop: () async {
+                            postBloc.add(GetPostByIdEvent(id: post.id!));
+                            return true;
+                          },
+                          child: CommentScreen(post: post),
+                        ),
+                      ],
+                    );
+                  }),
             ],
           )
         ],

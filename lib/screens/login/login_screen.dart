@@ -51,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
           _loadingLogin.value = true;
         } else if (state is LoginSuccessState) {
           _loadingLogin.value = false;
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
         } else {
           if (state is LoginErrorState) {
             Logger().i(state.message);

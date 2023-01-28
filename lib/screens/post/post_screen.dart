@@ -47,6 +47,14 @@ class _PostScreenState extends State<PostScreen> {
               dialogAlterBuilder(context, 'Thông báo', "Phiên đang nhập đã hết hạn, vui lòng đăng nhập lại"),
               Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false)
             }
+          else if (state is PostLoadedState && state.error != null)
+            {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message.toString()))),
+            }
+          else if (state is PostLoadedState && state.message != null)
+            {
+              dialogAlterBuilder(context, 'Thông báo', state.message.toString()),
+            }
         },
         builder: (context, state) {
           List<PostModel> postList = state.listPosts;

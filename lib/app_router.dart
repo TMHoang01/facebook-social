@@ -1,4 +1,5 @@
 import 'package:fb_copy/models/post_model.dart';
+import 'package:fb_copy/screens/comment/comment_screen.dart';
 import 'package:fb_copy/screens/home/home_screen.dart';
 import 'package:fb_copy/screens/login/auth_screen.dart';
 import 'package:fb_copy/screens/login/login_screen.dart';
@@ -22,7 +23,10 @@ class AppRouter {
         var post = settings.arguments as PostModel;
         var id = post.id;
         return MaterialPageRoute(builder: (_) => EditPostScreen(post: post));
-
+      case '/comment:id':
+        var post = settings.arguments as PostModel;
+        var id = post.id;
+        return MaterialPageRoute(builder: (_) => CommentScreen(post: post));
       default:
         return MaterialPageRoute(builder: (_) => AuthScreen());
     }

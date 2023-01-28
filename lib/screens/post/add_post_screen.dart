@@ -123,7 +123,8 @@ class _AddPostScreenState extends State<AddPostScreen> {
               Row(
                 children: <Widget>[
                   CircleAvatar(
-                    backgroundImage: AssetImage('assets/images/fb.png'),
+                    backgroundImage: NetworkImage(authUser!.avatar ??
+                        'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'),
                     radius: 24.0,
                   ),
                   SizedBox(width: 6.0),
@@ -131,32 +132,15 @@ class _AddPostScreenState extends State<AddPostScreen> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text('post.username', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0)),
+                      Text('${authUser!.username ?? "Người dùng Face"}',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0)),
                       SizedBox(height: 5.0),
-                      Text('post.time')
+                      // Text('post.time')
                     ],
                   ),
                 ],
               ),
               const SizedBox(height: 20.0),
-              Container(
-                child: TextField(
-                  controller: _textController,
-                  maxLines: null,
-                  minLines: 2,
-                  maxLength: 500,
-                  style: TextStyle(
-                    fontSize: _fontSize,
-                    fontWeight: FontWeight.w400,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: 'Bạn đang nghĩ gì?',
-                    hintStyle: TextStyle(color: Colors.grey),
-                    border: InputBorder.none,
-                  ),
-                  inputFormatters: [],
-                ),
-              ),
               EmojiTextField(
                 textController: _textController,
                 // fontSize: _fontSize,

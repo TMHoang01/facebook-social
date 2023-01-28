@@ -107,7 +107,7 @@ class PostRepository {
       formData.fields.add(MapEntry("token", token));
       formData.fields.add(MapEntry("described", described ?? ''));
       formData.fields.add(MapEntry("status", status ?? ''));
-      if (images!.isNotEmpty) {
+      if (images != null) {
         for (var i = 0; i < images.length; i++) {
           //check if the file type is jpeg, jpg, or png
 
@@ -245,18 +245,18 @@ class PostRepository {
   Future<ApiResponse> deletePost(String id) async {
     ApiResponse apiResponse = ApiResponse();
     Dio dio = Dio();
-    FormData formData = FormData();
-    formData.fields.add(MapEntry("token", token));
-    formData.fields.add(MapEntry("id", id));
     try {
       final response = await dio.post(
         '$postUrl/delete_post',
         options: Options(
           validateStatus: (_) => true,
-          contentType: "multipart/form-data",
+          contentType: "application/json",
           responseType: ResponseType.json,
         ),
-        data: formData,
+        data: jsonEncode({
+          "token": token,
+          "id": id,
+        }),
       );
       apiResponse = ApiResponse.fromJson(response.data);
       Logger().d('apiResponse delete_post: ${apiResponse.toJson()}');
@@ -268,24 +268,51 @@ class PostRepository {
     return apiResponse;
   }
 
-  Future<ApiResponse> reportPost(String id, String subject, String details) async {
+  Future<ApiResponse> likePost(String id) async {
+    ApiResponse apiResponse = ApiResponse();
+    Dio dio = Dio();
+    print('like_post: $likeUrl/like');
+    try {
+      final response = await dio.post(
+        '$likeUrl/like',
+        options: Options(
+          validateStatus: (_) => true,
+          contentType: "application/json",
+          responseType: ResponseType.json,
+        ),
+        data: jsonEncode({
+          "token": token,
+          "id": id,
+        }),
+      );
+      Logger().d('apiResponse like_post: ${response.data}');
+
+      apiResponse = ApiResponse.fromJson(response.data);
+    } catch (e) {
+      print(e);
+      Logger().e(e);
+      apiResponse.message = serviceError;
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> reportPost(String id) async {
     ApiResponse apiResponse = ApiResponse();
     Dio dio = Dio();
     FormData formData = FormData();
     formData.fields.add(MapEntry("token", token));
     formData.fields.add(MapEntry("id", id));
-    formData.fields.add(MapEntry("subject", subject));
-    formData.fields.add(MapEntry("details", details));
+
     try {
-      final response = await dio.post(
-        '$postUrl/delete_post',
-        options: Options(
-          validateStatus: (_) => true,
-          contentType: "multipart/form-data",
-          responseType: ResponseType.json,
-        ),
-        data: formData,
-      );
+      final response = await dio.post('$postUrl/delete_post',
+          options: Options(
+            validateStatus: (_) => true,
+            contentType: "multipart/form-data",
+            responseType: ResponseType.json,
+          ),
+          data: jsonEncode({
+            formData,
+          }));
       apiResponse = ApiResponse.fromJson(response.data);
       Logger().d('apiResponse delete_post: ${apiResponse.toJson()}');
     } catch (e) {

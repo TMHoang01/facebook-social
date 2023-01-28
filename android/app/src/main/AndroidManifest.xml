@@ -17,7 +17,7 @@
    <application
         android:label="fb_copy"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/fb_logo">
         <activity
             android:name=".MainActivity"
             android:exported="true"

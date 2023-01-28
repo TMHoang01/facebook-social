@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 class AuthModel {
   String? id;
   String? username;
@@ -23,5 +24,21 @@ class AuthModel {
     data['avatar'] = this.avatar;
     data['active'] = this.active;
     return data;
+  }
+
+  AuthModel copyWith({
+    String? id,
+    String? username,
+    String? token,
+    String? avatar,
+    String? active,
+  }) {
+    return AuthModel(
+      id: id ?? this.id,
+      username: username ?? this.username,
+      token: token ?? this.token,
+      avatar: avatar ?? this.avatar,
+      active: active ?? this.active,
+    );
   }
 }

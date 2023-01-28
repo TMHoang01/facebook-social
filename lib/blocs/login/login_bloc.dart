@@ -24,7 +24,10 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           // Map<String, dynamic> data = json.decode(response.data);
 
           AuthModel user = AuthModel.fromJson(response.data as Map<String, dynamic>);
-          // Logger().i(user.toJson());
+          if (user.username == null) {
+            user = user.copyWith(username: "Người dùng FaceBook");
+          }
+          Logger().i(user.toJson());
           SharedPreferences pref = await SharedPreferences.getInstance();
           pref.setString('authUser', json.encode(user.toJson()));
           Logger().d(pref.getString('authUser'));
@@ -34,7 +37,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         } else if (response.code == '9995' || response.code == '1004') {
           emit(LoginErrorState(message: '${response.details}'));
         } else {
-          emit(LoginErrorState(message: 'Server Error: ${response.message}}'));
+          emit(LoginErrorState(message: 'Server Error: ${response.message}'));
         }
       } catch (e) {
         Logger().e(e);

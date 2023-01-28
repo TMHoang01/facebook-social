@@ -70,14 +70,19 @@ class DeletePost extends PostEvent {
   List<Object> get props => [post];
 }
 
-class LoadMorePostEvent extends PostEvent {
-  final String lastId;
-  final int index;
-  final int count;
-  LoadMorePostEvent({required this.lastId, required this.index, required this.count});
-}
+// class LoadMorePostEvent extends PostEvent {
+//   final String lastId;
+//   final int index;
+//   final int count;
+//   LoadMorePostEvent({required this.lastId, required this.index, required this.count});
+// }
 
 class GetPostByIdEvent extends PostEvent {
   final String id;
   GetPostByIdEvent({required this.id});
+}
+
+class LikePostEvent extends PostEvent {
+  final PostModel post;
+  LikePostEvent({required this.post});
 }

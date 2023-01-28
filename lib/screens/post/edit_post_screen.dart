@@ -69,14 +69,16 @@ class _EditPostScreenState extends State<EditPostScreen> {
       print('change video != null');
       isChange = true;
     }
-    if (!listEquals(post.image, oldImages)) {
-      print('listEquals oldImages: $oldImages');
-      print('listEquals post.image: ${post.image}');
+    if (post.image != null) {
+      if (!listEquals(post.image, oldImages)) {
+        print('listEquals oldImages: $oldImages');
+        print('listEquals post.image: ${post.image}');
 
-      imagesDelete = post.image!.where((element) => !oldImages!.contains(element)).toList();
-      print('listEquals imagesDelete: $imagesDelete');
-      print('change listEquals(post.image, oldImages)');
-      isChange = true;
+        imagesDelete = post.image!.where((element) => !oldImages!.contains(element)).toList();
+        print('listEquals imagesDelete: $imagesDelete');
+        print('change listEquals(post.image, oldImages)');
+        isChange = true;
+      }
     }
     if (post.video != oldVideo) {
       print('change post.video != oldVideo');
@@ -106,7 +108,30 @@ class _EditPostScreenState extends State<EditPostScreen> {
             if (!checkChangePost()) {
               Navigator.pop(context);
             } else {
-              dialogAlterBuilder(context, 'Bỏ thay đổi', 'Nếu bỏ bây giờ thì bạn sẽ không lưu lại những thay đổi');
+              dialogConfirmBuilder(
+                context,
+                "Thông báo",
+                "Bạn có muốn thóa ra? Bài viết của bạn sẽ không được lưu lại",
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      child: Text('Chỉnh sửa tiếp', style: TextStyle(color: Colors.black, fontSize: 18.0)),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    TextButton(
+                      child: Text('Bỏ', style: TextStyle(color: Colors.blue, fontSize: 18.0)),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+                () {},
+              );
             }
           },
         ),
@@ -114,7 +139,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
         actions: [
           Container(
             margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            child: ElevatedButton(
+            child: TextButton(
               // enabled: checkChangePost(),
               onPressed: () {
                 if (checkChangePost()) {
@@ -129,21 +154,21 @@ class _EditPostScreenState extends State<EditPostScreen> {
                       described: _textController.text,
                     ),
                   );
-                  // Navigator.pop(context),
+                  Navigator.pop(context);
                   print('edit post change click Lưu');
                 } else {
                   print('edit post not change click Lưu');
                 }
               },
-              child: Text('Chỉnh sửa'),
-              style: ElevatedButton.styleFrom(
-                // enableFeedback: checkChangePost(),
-                disabledBackgroundColor: AppColor.grayColor,
+              child: Text('Lưu', style: TextStyle(color: Colors.blue)),
+              // style: ElevatedButton.styleFrom(
+              //   // enableFeedback: checkChangePost(),
+              //   disabledBackgroundColor: AppColor.grayColor,
 
-                // primary: Colors.blue,
-                backgroundColor: null,
-                onPrimary: Colors.white,
-              ),
+              //   // primary: Colors.blue,
+              //   backgroundColor: null,
+              //   onPrimary: Colors.white,
+              // ),
             ),
           ),
         ],
