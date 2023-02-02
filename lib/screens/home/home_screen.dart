@@ -3,6 +3,7 @@ import 'package:fb_copy/constants.dart';
 import 'package:fb_copy/screens/home/setting_screen.dart';
 import 'package:fb_copy/screens/loading_screen.dart';
 import 'package:fb_copy/screens/login/login_screen.dart';
+import 'package:fb_copy/screens/message/home_page.dart';
 import 'package:fb_copy/screens/notification/notifications_tab.dart';
 import 'package:fb_copy/screens/post/post_screen.dart';
 import 'package:fb_copy/screens/user/profile_screen.dart';
@@ -126,7 +127,16 @@ class TopBarApp extends StatelessWidget {
             );
           }, icon:   Icon(Icons.search, color: Colors.black)),
           SizedBox(width: 15.0),
-          Icon(FontAwesomeIcons.facebookMessenger, color: Colors.black)
+          IconButton(onPressed: (){
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return HomePage();
+                },
+              ),
+            );
+          }, icon: Icon(FontAwesomeIcons.facebookMessenger, color: Colors.black))
         ]),
       ],
     );
