@@ -44,39 +44,17 @@ class _SignupScreenState extends State<SignupScreen> {
               textAlign: TextAlign.center,
             ),
             SizedBox(height: size.height * 0.05),
-            btnThemeSignUp(
-              navigatorScreen: PhoneSignup(),
-              text: 'Tiếp',
-            ),
-            // ButtonTheme(
-            //   minWidth: double.infinity,
-            //   height: 44,
-            //   shape: RoundedRectangleBorder(
-            //     borderRadius: BorderRadius.circular(5),
-            //   ),
-            //   child: MaterialButton(
-            //     onPressed: () {
-            //       Navigator.push(context, MaterialPageRoute(builder: (context) {
-            //         return LoginScreen();
-            //       }));
-            //     },
-            //     child: Text(
-            //       'Tiếp',
-            //     ),
-            //     color: AppColor.kPrimaryColor,
-            //     textColor: AppColor.backgroundColor,
-            //   ),
-            // ),
+            BtnThemeSignUp(navigatorScreen: PhoneSignup(), text: 'Tiếp', check: true),
             SizedBox(height: size.height * 0.3),
             Align(
               alignment: Alignment.bottomCenter,
               child: TextButton(
-                child: new Text(
+                child: const Text(
                   "Bạn đã có tài khoản?",
                   style: TextStyle(fontWeight: FontWeight.bold, color: AppColor.kPrimaryColorText),
                 ),
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.pushReplacementNamed(context, '/login');
                 },
               ),
             ),

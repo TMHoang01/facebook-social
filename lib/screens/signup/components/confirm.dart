@@ -76,7 +76,7 @@ class _ConfirmSignupState extends State<ConfirmSignup> {
               ],
             ),
             SizedBox(height: size.height * 0.05),
-            btnThemeSignUp(navigatorScreen: NameSignup(), text: 'Xác nhận'),
+            BtnThemeSignUp(navigatorScreen: NameSignup(), text: 'Xác nhận'),
             // ButtonTheme(
             //   minWidth: double.infinity,
             //   child: MaterialButton(

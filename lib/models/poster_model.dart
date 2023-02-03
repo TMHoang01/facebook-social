@@ -7,7 +7,7 @@ class PosterModel {
 
   PosterModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    username = json['username'] ?? json['name'] ?? "FB";
+    username = json['username'] ?? json['name'] ?? "Người dùng Facebook";
     avatar = json['avatar'];
   }
 

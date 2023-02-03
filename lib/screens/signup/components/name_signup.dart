@@ -89,7 +89,7 @@ class NameSignup extends StatelessWidget {
             ),
 
             SizedBox(height: size.height * 0.07),
-            btnThemeSignUp(navigatorScreen: BirthdaySignup(), text: "Tiếp tục"),
+            BtnThemeSignUp(navigatorScreen: BirthdaySignup(), text: "Tiếp tục"),
             // ButtonTheme(
             //   minWidth: double.infinity,
             //   child: MaterialButton(

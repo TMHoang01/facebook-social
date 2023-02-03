@@ -17,14 +17,6 @@ class PostScreen extends StatefulWidget {
   State<PostScreen> createState() => _PostScreenState();
 }
 
-// class _PostScreenState extends State<PostScreen> with AutomaticKeepAliveClientMixin {
-//   @override
-//   bool get wantKeepAlive => true;
-
-//   // late List<PostModel> taskList;
-//   void _addPost(BuildContext context) {
-//     showModalBottomSheet(context: context, builder: (context) => SingleChildScrollView());
-//   }
 class _PostScreenState extends State<PostScreen> {
   late PostBloc _postBloc;
   @override
@@ -44,8 +36,14 @@ class _PostScreenState extends State<PostScreen> {
         listener: (context, state) => {
           if (state is PostExpiredTokenState)
             {
-              dialogAlterBuilder(context, 'Thông báo', "Phiên đang nhập đã hết hạn, vui lòng đăng nhập lại"),
-              Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false)
+              dialogAlterBuilder(
+                context,
+                'Thông báo',
+                "Phiên đang nhập đã hết hạn, vui lòng đăng nhập lại",
+                onPressed: () {
+                  Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+                },
+              )
             }
           else if (state is PostLoadedState && state.error != null)
             {
@@ -71,7 +69,7 @@ class _PostScreenState extends State<PostScreen> {
               ? LoadingScreen(text: 'Loading post...')
               : CustomScrollView(
                   slivers: [
-                    SliverToBoxAdapter(
+                    const SliverToBoxAdapter(
                       child: CreateFeedWidget(),
                     ),
                     SliverList(
@@ -89,7 +87,7 @@ class _PostScreenState extends State<PostScreen> {
                               //   child: Center(child: Text(index.toString() + '     ' + post.described.toString())),
                               // ),
                               PostWidget(post: post),
-                              DivederApp(),
+                              const DivederApp(),
                             ],
                           );
                         },
@@ -98,15 +96,15 @@ class _PostScreenState extends State<PostScreen> {
                     ),
 
                     (state is PostLoadedState && state.isNotPost == true)
-                        ? SliverToBoxAdapter(
+                        ? const SliverToBoxAdapter(
                             child: Center(
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: EdgeInsets.all(8.0),
                                 child: Text('No more post', style: TextStyle(color: Colors.grey, fontSize: 20)),
                               ),
                             ),
                           )
-                        : SliverToBoxAdapter(
+                        : const SliverToBoxAdapter(
                             child: Center(
                               child: CircularProgressIndicator(),
                             ),

@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 part of 'signup_bloc.dart';
 
 abstract class SignupState extends Equatable {
@@ -9,7 +10,24 @@ abstract class SignupState extends Equatable {
 
 class SignupInitialState extends SignupState {}
 
-class SignupUserState extends SignupState {}
+class SignupUserState extends SignupState {
+  String? phoneNumber;
+  String? password;
+  SignupUserState({
+    this.phoneNumber,
+    this.password,
+  });
+
+  SignupUserState copyWith({
+    String? phoneNumber,
+    String? password,
+  }) {
+    return SignupUserState(
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      password: password ?? this.password,
+    );
+  }
+}
 
 class SignupLoadingState extends SignupState {}
 

@@ -167,6 +167,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
 
       final ApiResponse response = await repo.getListPosts(lastId, listPosts.length, limitLoadPost, item++);
       Logger().d(response.code);
+      Logger().d(response.data);
       // response.code = '1000';
       if (response.code == '1000') {
         final Map<String, dynamic> data = response.data ?? <String, dynamic>{};

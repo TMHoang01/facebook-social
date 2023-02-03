@@ -53,7 +53,7 @@ class PostWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text('${post.author?.username ?? 'Người dùng fb'}',
+                      Text('${post.author?.username ?? 'Người dùng Facebook'}',
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0)),
                       const SizedBox(height: 5.0),
                       Text(post.created ?? 'vừa mới đây')
@@ -62,7 +62,7 @@ class PostWidget extends StatelessWidget {
                 ],
               ),
               IconButton(
-                icon: Icon(Icons.more_horiz),
+                icon: const Icon(Icons.more_horiz),
                 onPressed: () {
                   print('id: ${post.id} author name: ${authUser!.id} author id: ${post.author?.id}');
                   showModal(
@@ -70,8 +70,8 @@ class PostWidget extends StatelessWidget {
                     authUser!.id == post.author?.id
                         ? [
                             ListTile(
-                              leading: Icon(Icons.edit),
-                              title: Text('Sửa bài viết'),
+                              leading: const Icon(Icons.edit),
+                              title: const Text('Sửa bài viết'),
                               onTap: () {
                                 Navigator.of(context).pop();
 
@@ -86,8 +86,8 @@ class PostWidget extends StatelessWidget {
                               },
                             ),
                             ListTile(
-                              leading: Icon(Icons.delete),
-                              title: Text('Xóa bài viết'),
+                              leading: const Icon(Icons.delete),
+                              title: const Text('Xóa bài viết'),
                               onTap: () => {
                                 Navigator.of(context).pop(),
                                 dialogConfirmBuilder(
@@ -98,7 +98,7 @@ class PostWidget extends StatelessWidget {
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       TextButton(
-                                        child: Text('Hủy'),
+                                        child: const Text('Hủy'),
                                         onPressed: () {
                                           Navigator.of(context).pop();
                                         },
@@ -136,8 +136,8 @@ class PostWidget extends StatelessWidget {
                           ]
                         : [
                             ListTile(
-                              leading: Icon(Icons.report),
-                              title: Text('Báo cáo bài viết'),
+                              leading: const Icon(Icons.report),
+                              title: const Text('Báo cáo bài viết'),
                               onTap: () => {
                                 // showModalFullSheet(
                                 //   context,
@@ -225,7 +225,8 @@ class PostWidget extends StatelessWidget {
                     ),
                   ),
                   Text(
-                      ' ${(post.like == "1" && post.isLiked == "1") ? authUser!.username : (int.parse(post.like!) < 100 && post.isLiked == "1") ? "Bạn và ${int.parse(post.like!) - 1} người khác" : post.like}'),
+                    ' ${post.like != null && post.isLiked != null ? (post.like == "1" && post.isLiked == "1") ? (authUser?.username ?? "Bạn") : (int.parse(post.like!) < 100 && post.isLiked == "1") ? "Bạn và ${int.parse(post.like!) - 1} người khác" : post.like : ""}',
+                  ),
                 ],
               ),
               Row(

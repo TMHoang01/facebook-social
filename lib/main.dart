@@ -1,14 +1,18 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:fb_copy/blocs/auth/auth_bloc.dart';
+import 'package:fb_copy/blocs/friends/friends_bloc.dart';
 import 'package:fb_copy/blocs/internet/internet_bloc.dart';
 import 'package:fb_copy/blocs/login/login_bloc.dart';
 import 'package:fb_copy/blocs/picker_image/picker_image_bloc.dart';
 import 'package:fb_copy/blocs/post/post_bloc.dart';
 import 'package:fb_copy/repositories/auth_repository.dart';
+import 'package:fb_copy/repositories/friendrespository.dart';
 import 'package:fb_copy/repositories/post_repository.dart';
 import 'package:fb_copy/screens/home/home_screen.dart';
 import 'package:fb_copy/screens/login/auth_screen.dart';
 import 'package:fb_copy/screens/login/login_screen.dart';
+import 'package:fb_copy/screens/signup/signup_screen.dart';
+
 import 'package:fb_copy/screens/post/add_post_screen.dart';
 import 'package:fb_copy/screens/post/post_screen.dart';
 import 'package:flutter/material.dart';
@@ -50,6 +54,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => AuthBloc()..add(AuthInitEvent()),
         ),
+        BlocProvider(
+          create: (context) => FriendsBloc(FriendsRespository()),
+        ),
       ],
       child: MaterialApp(
         title: 'Facebook',
@@ -66,7 +73,7 @@ class MyApp extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   behavior: SnackBarBehavior.floating,
-                  margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                  margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
                   content: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -81,7 +88,7 @@ class MyApp extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   behavior: SnackBarBehavior.floating,
-                  margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                  margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
                   content: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -94,8 +101,8 @@ class MyApp extends StatelessWidget {
               );
             }
           },
-          child: AuthScreen(),
-          // child: LoginScreen(),
+          // child: AuthScreen(),
+          child: SignupScreen(),
         ),
       ),
     );

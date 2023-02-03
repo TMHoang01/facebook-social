@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const host = '192.168.1.63';
+const host = '169.254.109.23';
 const baseUrl = "http://$host:5000/it4788";
 const authUrl = '$baseUrl/auth';
 const friendUrl = '$baseUrl/friend';
@@ -37,18 +37,17 @@ class AppColor {
   static const Color greenColor = Color(0xFF42b72a);
   static const Color grayColor = Color(0xFF8D8D8D);
   static const Color secondaryColor = Color(0xFFE9EBEE);
-
-  static const kPrimaryColor = Color(0xFF1979FF);
-  static const kPrimaryLightColor = Color(0xFFE3F2FD);
-  static const kPrimaryColorText = Color(0xFF1979FF);
-  static const backgroundColor = Color(0xFFFFFFFF);
-  static const textColor = Color(0xFFFFFFFF);
-  static const kColorTextNormal = Color(0xFF000000);
-  static const kBlack = Color(0xFF000000);
-  static const kColorButton = Color(0xFF757575);
-  static const kBackgroundGrey = Color(0xFFe4e6eb);
-  static const kGreenComment = Color(0xff00c853);
-  static const kDanger = Color(0xffc62828);
+  static const Color kPrimaryColor = Color(0xFF1979FF);
+  static const Color kPrimaryLightColor = Color(0xFFE3F2FD);
+  static const Color kPrimaryColorText = Color(0xFF1979FF);
+  static const Color backgroundColor = Color(0xFFFFFFFF);
+  static const Color textColor = Color(0xFFFFFFFF);
+  static const Color kColorTextNormal = Color(0xFF000000);
+  static const Color kBlack = Color(0xFF000000);
+  static const Color kColorButton = Color(0xFF757575);
+  static const Color kBackgroundGrey = Color(0xFFe4e6eb);
+  static const Color kGreenComment = Color(0xff00c853);
+  static const Color kDanger = Color(0xffc62828);
 }
 
 // ------ Error ------

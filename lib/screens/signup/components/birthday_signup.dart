@@ -80,7 +80,7 @@ class _BirthdaySignupState extends State<BirthdaySignup> {
               ),
             ),
             SizedBox(height: size.height * 0.1),
-            btnThemeSignUp(navigatorScreen: HomeScreen(), text: 'Tiếp'),
+            BtnThemeSignUp(navigatorScreen: HomeScreen(), text: 'Tiếp'),
           ],
         ),
       ),

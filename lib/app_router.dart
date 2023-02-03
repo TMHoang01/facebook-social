@@ -5,6 +5,7 @@ import 'package:fb_copy/screens/login/auth_screen.dart';
 import 'package:fb_copy/screens/login/login_screen.dart';
 import 'package:fb_copy/screens/post/add_post_screen.dart';
 import 'package:fb_copy/screens/post/edit_post_screen.dart';
+import 'package:fb_copy/screens/signup/signup_screen.dart';
 import 'package:flutter/material.dart';
 
 class AppRouter {
@@ -14,6 +15,14 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => AuthScreen());
       case '/login':
         return MaterialPageRoute(builder: (_) => LoginScreen());
+      case '/signup':
+        return MaterialPageRoute(builder: (_) => SignupScreen());
+      case '/signup/phone':
+        return MaterialPageRoute(builder: (_) => SignupScreen());
+      case '/signup/otp':
+        return MaterialPageRoute(builder: (_) => SignupScreen());
+      case '/signup/complete':
+        return MaterialPageRoute(builder: (_) => SignupScreen());
 
       case '/home':
         return MaterialPageRoute(builder: (_) => HomeScreen());

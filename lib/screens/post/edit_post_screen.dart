@@ -221,7 +221,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text('${post.author!.username ?? 'Người dùng FB'}',
+                      Text('${post.author!.username ?? 'Người dùng Facebook'}',
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0)),
                       SizedBox(height: 5.0),
                       Text('${post.status ?? ''}')

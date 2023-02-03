@@ -87,7 +87,7 @@ class AuthRepository {
     ApiResponse apiResponse = ApiResponse();
     try {
       print('$authUrl/check_new_version');
-      logger.d('begin check token  ' + token);
+      // logger.d('begin check token  ' + token);
 
       var response = await http.post(
         Uri.parse('$authUrl/check_new_version'),
@@ -99,8 +99,8 @@ class AuthRepository {
           'last_update': '1.0',
         }),
       );
-      logger.i(jsonDecode(response.body));
-      logger.d('after check token  ' + token);
+      // logger.i(jsonDecode(response.body));
+      // logger.d('after check token  ' + token);
       apiResponse = ApiResponse.fromJson(jsonDecode(response.body));
     } catch (e) {
       print(e);

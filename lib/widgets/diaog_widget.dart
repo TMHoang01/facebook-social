@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-Future<void> dialogAlterBuilder(BuildContext context, String title, String content) {
+Future<void> dialogAlterBuilder(BuildContext context, String title, String content, {Function? onPressed}) {
   return showDialog<void>(
     context: context,
     builder: (BuildContext context) {
@@ -23,7 +23,11 @@ Future<void> dialogAlterBuilder(BuildContext context, String title, String conte
             ),
             child: const Text('OK'),
             onPressed: () {
-              Navigator.of(context).pop();
+              if (onPressed != null) {
+                onPressed();
+              } else {
+                Navigator.of(context).pop();
+              }
             },
           ),
         ],

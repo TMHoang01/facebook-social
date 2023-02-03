@@ -132,7 +132,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text('${authUser!.username ?? "Người dùng Face"}',
+                      Text('${authUser!.username ?? "Người dùng Facebook"}',
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0)),
                       SizedBox(height: 5.0),
                       // Text('post.time')

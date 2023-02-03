@@ -3,31 +3,36 @@ import 'package:flutter/material.dart';
 import 'package:fb_copy/constants.dart';
 
 class ProfileAvatar extends StatelessWidget {
-  final String avatar;
-  final bool isActive;
-  final bool hasBorder;
+  String? avatar;
+  double? radius;
+  bool? isActive;
+  bool? hasBorder;
 
-  const ProfileAvatar({
+  ProfileAvatar({
     Key? key,
     required this.avatar,
-    this.isActive = false,
-    this.hasBorder = false,
+    this.radius,
+    this.isActive,
+    this.hasBorder,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    String avatarDefault =
+        'https://firebasestorage.googleapis.com/v0/b/savvy-celerity-368016.appspot.com/o/avatar_default.png?alt=media';
     return Stack(
       children: [
         CircleAvatar(
-          radius: 20.0,
+          radius: radius ?? 20.0,
           backgroundColor: AppColor.kPrimaryColor,
           child: CircleAvatar(
-            radius: hasBorder ? 17.0 : 20.0,
-            backgroundColor: Colors.grey[200],
-            backgroundImage: CachedNetworkImageProvider(avatar),
-          ),
+              radius: hasBorder ?? false ? radius! - 2 : radius,
+              backgroundColor: Colors.grey[200],
+              backgroundImage: CachedNetworkImageProvider(
+                avatar ?? avatarDefault,
+              )),
         ),
-        isActive
+        isActive ?? false
             ? Positioned(
                 bottom: 0.0,
                 right: 0.0,
