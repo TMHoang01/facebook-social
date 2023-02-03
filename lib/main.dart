@@ -94,7 +94,7 @@ class MyApp extends StatelessWidget {
               );
             }
           },
-          child: AuthScreen(),
+          child: HomeScreen(),
           // child: LoginScreen(),
         ),
       ),
