@@ -1,14 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fb_copy/constants.dart';
-import 'package:fb_copy/screens/friend/friend_screen.dart';
 import 'package:fb_copy/screens/home/setting_screen.dart';
 import 'package:fb_copy/screens/loading_screen.dart';
 import 'package:fb_copy/screens/login/login_screen.dart';
+import 'package:fb_copy/screens/message/home_page.dart';
+import 'package:fb_copy/screens/notification/notifications_tab.dart';
 import 'package:fb_copy/screens/post/post_screen.dart';
 import 'package:fb_copy/screens/user/profile_screen.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,19 +21,18 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   TabController? _tabController;
   final List<Widget> _tabs = [
-    FriendsTab(),
     PostScreen(),
-    // LoadingScreen(text: '( FriendScreen('),
-    // ProfileScreen(),
-    LoadingScreen(text: '( Watch('),
-    LoadingScreen(text: '( Notify('),
+    LoadingScreen(text: '( FriendScreen('),
+    LoadingScreen(text: 'watch tab'),
+    ProfileScreen(),
+    NotificationsTab(),
     MenuTabScreen(),
   ];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(vsync: this, length: 5);
+    _tabController = TabController(vsync: this, length: 6);
   }
 
   @override
@@ -53,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             floating: true,
             snap: true,
             // title: _tabController!.index == 0 ? Center(child: TopBarApp()) : null,
-            title: const Center(child: TopBarApp()),
+            title: Center(child: TopBarApp()),
             pinned: true,
             bottom: TabBar(
               controller: _tabController,
@@ -64,6 +64,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 Tab(icon: Icon(Icons.home, size: 30.0)),
                 Tab(icon: Icon(Icons.people, size: 30.0)),
                 Tab(icon: Icon(Icons.ondemand_video, size: 30.0)),
+                Tab(icon: Icon(Icons.account_circle, size: 30.0)),
                 Tab(icon: Icon(Icons.notifications, size: 30.0)),
                 Tab(icon: Icon(Icons.menu, size: 30.0)),
                 // Tab(icon: Icon(Icons.menu, size: 30.0)),
@@ -80,28 +81,28 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 }
 
-// class TabBarApp extends StatelessWidget {
-//   const TabBarApp({super.key, required TabController tabController}) : _tabController = tabController;
-//   final TabController _tabController;
+class TabBarApp extends StatelessWidget {
+  const TabBarApp({required TabController tabController}) : _tabController = tabController;
+  final TabController _tabController;
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return TabBar(
-//       indicatorColor: Colors.blueAccent,
-//       controller: _tabController,
-//       unselectedLabelColor: Colors.grey,
-//       labelColor: Colors.blueAccent,
-//       tabs: const [
-//         Tab(icon: Icon(Icons.home, size: 30.0)),
-//         Tab(icon: Icon(Icons.people, size: 30.0)),
-//         Tab(icon: Icon(Icons.ondemand_video, size: 30.0)),
-//         Tab(icon: Icon(Icons.account_circle, size: 30.0)),
-//         Tab(icon: Icon(Icons.notifications, size: 30.0)),
-//         Tab(icon: Icon(Icons.menu, size: 30.0))
-//       ],
-//     );
-//   }
-// }
+  @override
+  Widget build(BuildContext context) {
+    return TabBar(
+      indicatorColor: Colors.blueAccent,
+      controller: _tabController,
+      unselectedLabelColor: Colors.grey,
+      labelColor: Colors.blueAccent,
+      tabs: [
+        Tab(icon: Icon(Icons.home, size: 30.0)),
+        Tab(icon: Icon(Icons.people, size: 30.0)),
+        Tab(icon: Icon(Icons.ondemand_video, size: 30.0)),
+        Tab(icon: Icon(Icons.account_circle, size: 30.0)),
+        Tab(icon: Icon(Icons.notifications, size: 30.0)),
+        Tab(icon: Icon(Icons.menu, size: 30.0))
+      ],
+    );
+  }
+}
 
 class TopBarApp extends StatelessWidget {
   const TopBarApp({
@@ -114,27 +115,119 @@ class TopBarApp extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
         Row(
-          children: const <Widget>[
+          children: <Widget>[
             Text('facebook', style: TextStyle(color: Colors.blueAccent, fontSize: 27.0, fontWeight: FontWeight.bold)),
           ],
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: const <Widget>[
-            Icon(Icons.search, color: Colors.black),
-            SizedBox(width: 15.0),
-            Icon(FontAwesomeIcons.facebookMessenger, color: Colors.black)
-          ],
-        ),
+        Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
+          IconButton(onPressed: (){
+            showSearch(
+                context: context,
+                delegate: CustomSearch()
+            );
+          }, icon:   Icon(Icons.search, color: Colors.black)),
+          SizedBox(width: 15.0),
+          IconButton(onPressed: (){
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return HomePage();
+                },
+              ),
+            );
+          }, icon: Icon(FontAwesomeIcons.facebookMessenger, color: Colors.black))
+        ]),
       ],
     );
   }
 }
 
-void _scrollToTop(BuildContext context) {
-  Scrollable.ensureVisible(
-    context.findRenderObject() as BuildContext,
-    duration: const Duration(milliseconds: 500),
-    curve: Curves.easeInOut,
-  );
+class CustomSearch extends SearchDelegate{
+  List<String> allData = [
+    'Phan Nguyen', 'Minh Hoang', 'Khanh Hung', 'Thu Hieu', 'Thu Ha',
+    'Van Tien', 'Van Nhat'
+  ];
+  @override
+  List<Widget>? buildActions(BuildContext context) {
+    return[
+      IconButton(
+          onPressed: (){
+            query = '';
+          },
+          icon: const Icon(Icons.clear)
+      )
+    ];
+  }
+
+  @override
+  Widget? buildLeading(BuildContext context) {
+    return
+      IconButton(
+          onPressed: (){
+           close(context, null);
+          },
+          icon: const Icon(Icons.arrow_back)
+      );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    List<String> matchQuery = [];
+    for(var item in allData){
+      if(item.toLowerCase().contains(query.toLowerCase())){
+        matchQuery.add(item);
+      }
+    }
+    return ListView.builder(
+        itemCount: matchQuery.length,
+        itemBuilder: (context, index){
+          var result = matchQuery[index];
+          return ListTile(
+            title: Text(
+              result,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  color: Colors.black54,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold),
+            ),
+            leading: CircleAvatar(
+              backgroundImage: NetworkImage('https://i.picsum.photos/id/769/200/200.jpg?hmac=M55kAfuYOrcJ8a49hBRDhWtVLbJo88Y76kUz323SqLU'),
+            ),                  );
+        }
+    );
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    List<String> matchQuery = [];
+    for(var item in allData){
+      if(item.toLowerCase().contains(query.toLowerCase())){
+        matchQuery.add(item);
+      }
+    }
+    return ListView.builder(
+      itemCount: matchQuery.length,
+        itemBuilder: (context, index){
+         var result = matchQuery[index];
+         return ListTile(
+           title: Text(
+             result,
+             maxLines: 1,
+             overflow: TextOverflow.ellipsis,
+             style: TextStyle(
+                 color: Colors.black54,
+                 fontSize: 16,
+                 fontWeight: FontWeight.bold),
+           ),
+           leading: CircleAvatar(
+             backgroundImage: NetworkImage('https://i.picsum.photos/id/769/200/200.jpg?hmac=M55kAfuYOrcJ8a49hBRDhWtVLbJo88Y76kUz323SqLU'),
+           ),
+         );
+        }
+    );
+  }
+
 }
