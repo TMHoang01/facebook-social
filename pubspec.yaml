@@ -35,17 +35,20 @@ dependencies:
   date_format: ^2.0.7
   date_time_picker: ^2.1.0
   dio: ^4.0.6
+  easy_rich_text: ^1.1.0
   equatable: ^2.0.5
   flutter:
     sdk: flutter
   flutter_bloc: ^8.1.1
   flutter_cache_manager: ^3.3.0
+  flutter_countdown_timer: ^4.1.0
   flutter_linkify: ^5.0.2
   flutter_svg: ^1.1.6
   flutter_verification_code: ^1.1.6
   font_awesome_flutter: ^10.3.0
   http: ^0.13.5
   image_picker: ^0.8.6
+  line_icons: ^2.0.1
   logger: ^1.1.0
   material_design_icons_flutter: ^6.0.7096
   photo_view: ^0.14.0
@@ -57,9 +60,6 @@ dependencies:
   timeago: ^3.3.0
   url_launcher: ^6.1.7
   video_player: ^2.4.10
-  font_awesome_flutter: ^10.3.0
-  line_icons: ^2.0.1
-
 
 dev_dependencies:
   flutter_lints: ^2.0.0

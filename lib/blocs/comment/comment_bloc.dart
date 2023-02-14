@@ -108,9 +108,11 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
           index: listComments.length.toString(),
           count: count.toString(),
         );
+        Logger().i(response);
         if (response.code == '1000') {
           final List<dynamic> data = response.data ?? <dynamic>[];
           if (data.isEmpty) {
+            Logger().i('empty');
             emit(CommentLoadedState(listComments: listComments, isNotComment: true));
             return;
           }
@@ -119,11 +121,14 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
             final CommentModel commentModel = CommentModel.fromJson(itemMap);
             listComments.add(commentModel);
           }
+          bool isNotComment = (count == data.length);
+          emit(CommentLoadedState(listComments: listComments, isNotComment: isNotComment));
         } else if (response.code == '9994') {
           emit(CommentLoadedState(listComments: listComments, isNotComment: true));
           return;
+        } else {
+          emit(CommentLoadedState(listComments: listComments));
         }
-        emit(CommentLoadedState(listComments: listComments));
       } catch (e) {
         emit(CommentLoadedState(listComments: [], error: e.toString()));
       }

@@ -28,8 +28,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    phoneNumberController = TextEditingController(text: '0987654321');
-    passwordControler = TextEditingController(text: '1234567890');
+    phoneNumberController = TextEditingController();
+    passwordControler = TextEditingController();
     passwordVisibility = false;
     isIconVisiblePass = false;
     loginBloc = BlocProvider.of<LoginBloc>(context);
@@ -100,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 // backgroung_login image
                 Container(
                   height: 200,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     image: DecorationImage(
                       image: AssetImage('assets/images/facebook_logo/background_login.jpg'),
                       fit: BoxFit.cover,
@@ -109,14 +109,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 // padding
                 Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(24, 60, 24, 0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(24, 60, 24, 0),
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       _formLogin(),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       TextButton(
                         onPressed: () {},
                         child: const Text('Quên mật khẩu?'),
@@ -124,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 25),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
+                        children: const [
                           Expanded(
                             child: Divider(
                               thickness: 1,
@@ -155,8 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: Text("Đăng ký"),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColor.greenColor,
-                            primary: AppColor.greenColor,
-                            minimumSize: Size(double.infinity, 35),
+                            minimumSize: const Size(double.infinity, 35),
                           ),
                         ),
                       )
@@ -181,12 +180,8 @@ class _LoginScreenState extends State<LoginScreen> {
             textInputAction: TextInputAction.next,
             keyboardType: TextInputType.phone,
             decoration: const InputDecoration(
-              // labelText: 'Phone Number',
               hintText: 'Nhập số điên thoại',
               focusColor: AppColor.primaryColor,
-              // border: OutlineInputBorder(
-              //   borderRadius: BorderRadius.circular(90.0),
-              // ),
             ),
             validator: (value) {
               if (value!.isEmpty) {
@@ -201,11 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
             keyboardType: TextInputType.visiblePassword,
             obscureText: !passwordVisibility,
             textInputAction: TextInputAction.done,
-            onChanged: (value) => {
-              // setState(() {
-              //   isIconVisiblePass = !value.isNotEmpty;
-              // })
-            },
+            onChanged: (value) => {},
             decoration: InputDecoration(
               hintText: 'Nhập mật khẩu',
               suffixIcon: passwordControler!.text.isNotEmpty
@@ -246,12 +237,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   minimumSize: const Size(double.infinity, 45),
                 ),
                 onPressed: () {
-                  // BlocProvider.of<LoginBloc>(context)
-                  //     .add(LoginButtonPress(
-                  //   phone: phoneNumberController.toString(),
-                  //   password: passwordControler.toString(),
-                  // ));
-                  // _loadingLogin = ValueNotifier(true);
+                  if (passwordControler!.text.isEmpty || phoneNumberController!.text.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Vui lòng nhập đầy đủ thông tin'),
+                      ),
+                    );
+                    return;
+                  }
                   loginBloc
                       .add(LoginButtonPress(phone: phoneNumberController!.text, password: passwordControler!.text));
                 },

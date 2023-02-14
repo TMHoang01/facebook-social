@@ -4,6 +4,7 @@ import 'package:fb_copy/blocs/picker_image/picker_image_bloc.dart';
 import 'package:fb_copy/blocs/post/post_bloc.dart';
 import 'package:fb_copy/constants.dart';
 import 'package:fb_copy/screens/post/components/input_field_widget.dart';
+import 'package:fb_copy/widgets/bottomsheet_widget.dart';
 import 'package:fb_copy/widgets/diaog_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -55,11 +56,33 @@ class _AddPostScreenState extends State<AddPostScreen> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             print(
-                ' back: text controoler is Empty ${_textController.text.isEmpty} \n back: images is Empty ${images!.isEmpty} \n back: video is Empty ${video == null}');
-            if (_textController.text.isEmpty && video == null && images!.isEmpty) {
+                ' back: text controoler is Empty ${_textController.text.isEmpty} \n back: images is Empty ${images == null} \n back: video is Empty ${video == null}');
+            if (_textController.text.isEmpty && video == null && images == null) {
               Navigator.pop(context);
             } else {
-              dialogAlterBuilder(context, 'Thông báo', 'content');
+              // show dialog comfirm
+              showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                        title: const Text('Bạn có muốn hủy bài viết?'),
+                        content: const Text('Nội dung bài viết sẽ không được lưu lại'),
+                        actions: [
+                          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Hủy')),
+                          TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                              },
+                              child: const Text('Đồng ý')),
+                        ],
+                      ));
+              // showModal(
+              //   context,
+              //   [
+              //     TextButton(onPressed: () => Navigator.pop(context), child: Text('Hủy')),
+              //     TextButton(onPressed: () => Navigator.pop(context), child: Text('Đồng ý')),
+              //   ],
+              // );
             }
           },
         ),

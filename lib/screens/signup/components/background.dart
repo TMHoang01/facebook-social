@@ -16,6 +16,7 @@ class Background extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),

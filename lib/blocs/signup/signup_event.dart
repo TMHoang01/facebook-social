@@ -17,23 +17,43 @@ class SignupUserEvent extends SignupEvent {
   });
 }
 
-class verifyCodeEvent extends SignupEvent {
+class VerifyCodeEvent extends SignupEvent {
   final String code;
-  verifyCodeEvent({
+  final String phone;
+  VerifyCodeEvent({
     required this.code,
+    required this.phone,
   });
 }
 
-class verifyPhoneNumberEvent extends SignupEvent {
+// class VerifyCodeLoadingEvent extends SignupEvent {}
+
+class SignupGetCodeVerifyEvent extends SignupEvent {
+  final String phone;
+  SignupGetCodeVerifyEvent({
+    required this.phone,
+  });
+}
+
+class VerifyPhoneNumberEvent extends SignupEvent {
   final String phoneNumber;
-  verifyPhoneNumberEvent({
+  VerifyPhoneNumberEvent({
     required this.phoneNumber,
   });
 }
 
-class verifyPasswordEvent extends SignupEvent {
+class VerifyPasswordEvent extends SignupEvent {
   final String password;
-  verifyPasswordEvent({
+  VerifyPasswordEvent({
     required this.password,
+  });
+}
+
+class ChangeInfoAfterSignup extends SignupEvent {
+  final String username;
+  final XFile? avatar;
+  ChangeInfoAfterSignup({
+    required this.username,
+    required this.avatar,
   });
 }

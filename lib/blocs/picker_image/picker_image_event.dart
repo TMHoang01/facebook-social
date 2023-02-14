@@ -16,11 +16,13 @@ class PickerImageEditPostEvent extends PickerImageEvent {
 }
 
 class onSelectMultipleImageEvent extends PickerImageEvent {
-//   final List<XFile> images;
-//   onSelectMultipleImageEvent(this.images);
+  // final List<XFile> images;
+  // onSelectMultipleImageEvent(this.images);
 
   onSelectMultipleImageEvent();
 }
+
+class onTakeImageEvent extends PickerImageEvent {}
 
 class onRemoveImageEvent extends PickerImageEvent {
   XFile? image;
@@ -31,5 +33,3 @@ class onRemoveImageEvent extends PickerImageEvent {
 class onSelevtVideoEvent extends PickerImageEvent {}
 
 class onRemoveVideoEvent extends PickerImageEvent {}
-
-class onTakeImageEvent extends PickerImageEvent {}

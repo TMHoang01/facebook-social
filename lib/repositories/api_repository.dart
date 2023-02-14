@@ -2,7 +2,7 @@ class ApiResponse {
   String? code;
   String? message;
   dynamic data; // Chỉnh lại thành dynamic
-  Object? details;
+  String? details;
   ApiResponse({
     this.code,
     this.message,

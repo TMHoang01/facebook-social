@@ -190,7 +190,9 @@ class _CommentListState extends State<_CommentList> {
                   itemCount: listComments.length,
                   itemBuilder: (context, index) {
                     CommentModel comment = listComments[index];
-                    return _ItemComment(comment: comment);
+                    if (comment.poster != null) return _ItemComment(comment: comment);
+                    // else
+                    // return Text('Binh luận này đã bị xóa');
                   },
                   separatorBuilder: (context, index) {
                     if (index == listComments.length - 2 && state is CommentLoadedState && state.isNotComment == true) {

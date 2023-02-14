@@ -1,3 +1,5 @@
+import 'package:fb_copy/models/auth_model.dart';
+
 class UserModel {
   String? id;
   String? username;
@@ -43,6 +45,12 @@ class UserModel {
     isFriend = json['is_friend'];
     sameFriends = json['same_friends'];
     online = json['online'];
+  }
+
+  UserModel.fromAuthModel(AuthModel authModel) {
+    id = authModel.id;
+    username = authModel.username;
+    avatar = authModel.avatar;
   }
 
   Map<String, dynamic> toJson() {

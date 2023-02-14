@@ -30,8 +30,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           Logger().i(user.toJson());
           SharedPreferences pref = await SharedPreferences.getInstance();
           pref.setString('authUser', json.encode(user.toJson()));
-          Logger().d(pref.getString('authUser'));
           token = user.token!;
+          authUser = user;
+          Logger().d(authUser);
           // pref.setString('user_logig', user.toJson().toString());
           emit(LoginSuccessState());
         } else if (response.code == '9995' || response.code == '1004') {

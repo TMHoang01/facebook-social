@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
+import 'package:http_parser/http_parser.dart';
 
 class AuthRepository {
   var logger = Logger();
@@ -109,13 +110,18 @@ class AuthRepository {
     return apiResponse;
   }
 
-  Future<ApiResponse> checkVerifyCode(String code, String phone) async {
+  Future<ApiResponse> checkVerifyCode({required String code, required String phone}) async {
     ApiResponse apiResponse = ApiResponse();
     Dio dio = Dio();
     try {
       print('$authUrl/check_verify_code');
       var response = await dio.post(
         '$authUrl/check_verify_code',
+        options: Options(
+          validateStatus: (_) => true,
+          contentType: Headers.jsonContentType,
+          responseType: ResponseType.json,
+        ),
         data: {
           'code_verify': code,
           'phonenumber': phone,
@@ -130,23 +136,69 @@ class AuthRepository {
     return apiResponse;
   }
 
-  Future<ApiResponse> changeIfnoAfterSignup(String username, XFile avatar) async {
+  Future<ApiResponse> getVerifyCode({required String phone}) async {
+    ApiResponse apiResponse = ApiResponse();
+    Dio dio = Dio();
+    try {
+      print('$authUrl/get_verify_code: phone: $phone');
+      final response = await dio.post(
+        '$authUrl/get_verify_code',
+        options: Options(
+          validateStatus: (_) => true,
+          contentType: Headers.jsonContentType,
+          responseType: ResponseType.json,
+        ),
+        data: {
+          'phonenumber': phone,
+        },
+      );
+      Logger().d(response.data);
+      apiResponse = ApiResponse.fromJson(response.data);
+    } catch (e) {
+      print(e);
+      apiResponse.message = serviceError;
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> changeIfnoAfterSignup({required String username, XFile? avatar}) async {
     ApiResponse apiResponse = ApiResponse();
     Dio dio = Dio();
 
     try {
       FormData formData = FormData.fromMap({
         'username': username,
-        'avatar': await MultipartFile.fromFile(avatar.path),
+        'token': token,
       });
+      if (avatar != null) {
+        formData.files.add(
+          MapEntry(
+            "avatar",
+            MultipartFile.fromBytes(
+              await avatar.readAsBytes(),
+              filename: avatar.name,
+              contentType: MediaType('image', 'jpg|jpeg|png'),
+            ),
+          ),
+        );
+      }
 
       print('$authUrl/change_info_after_signup');
       var response = await dio.post(
         '$authUrl/change_info_after_signup',
+        queryParameters: {
+          'token': token,
+        },
+        options: Options(
+          validateStatus: (_) => true,
+          contentType: "multipart/form-data",
+          responseType: ResponseType.json,
+        ),
         data: formData,
       );
-      // logger.i(response.data);
+      logger.i(response.data, 'data');
       apiResponse = ApiResponse.fromJson(response.data);
+      Logger().d('apiResponse: ${apiResponse.toJson()}');
     } catch (e) {
       print(e);
       apiResponse.message = serviceError;

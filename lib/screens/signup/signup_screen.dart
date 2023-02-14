@@ -1,4 +1,5 @@
 import 'package:fb_copy/constants.dart';
+import 'package:fb_copy/models/user_model.dart';
 import 'package:fb_copy/screens/login/login_screen.dart';
 import 'package:fb_copy/screens/signup/components/background.dart';
 import 'package:fb_copy/screens/signup/components/phonenumber.dart';
@@ -14,6 +15,8 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
+  final UserModel? user = UserModel();
+
   PageController _pageController = PageController();
   String _nextPage = 'Next';
 

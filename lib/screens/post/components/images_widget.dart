@@ -44,6 +44,7 @@ class ImagesPost extends StatelessWidget {
           child: CachedNetworkImage(
             imageUrl: post.image![0].url.toString(),
             width: MediaQuery.of(context).size.width,
+            height: 300.0,
             fit: BoxFit.cover,
             placeholder: (context, url) => SizedBox(
               child: Container(
@@ -267,7 +268,7 @@ class ImagesPost extends StatelessWidget {
                           onViewImage(context, 3),
                         },
                         child: CachedNetworkImage(
-                          imageUrl: post.image![2].url.toString(),
+                          imageUrl: post.image![3].url.toString(),
                           width: MediaQuery.of(context).size.width,
                           fit: BoxFit.cover,
                           placeholder: (context, url) => SizedBox(

@@ -5,6 +5,7 @@ import 'package:fb_copy/blocs/internet/internet_bloc.dart';
 import 'package:fb_copy/blocs/login/login_bloc.dart';
 import 'package:fb_copy/blocs/picker_image/picker_image_bloc.dart';
 import 'package:fb_copy/blocs/post/post_bloc.dart';
+import 'package:fb_copy/blocs/signup/signup_bloc.dart';
 import 'package:fb_copy/repositories/auth_repository.dart';
 import 'package:fb_copy/repositories/friendrespository.dart';
 import 'package:fb_copy/repositories/post_repository.dart';
@@ -57,6 +58,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => FriendsBloc(FriendsRespository()),
         ),
+        BlocProvider(
+          create: (context) => SignupBloc(AuthRepository()),
+        ),
       ],
       child: MaterialApp(
         title: 'Facebook',
@@ -68,7 +72,6 @@ class MyApp extends StatelessWidget {
         home: BlocListener<InternetBloc, InternetState>(
           listenWhen: (previous, current) => (previous is! InternetInitialState),
           listener: (context, state) {
-            // TODO: implement listener
             if (state is ConnectionInternetState) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -101,8 +104,8 @@ class MyApp extends StatelessWidget {
               );
             }
           },
-          // child: AuthScreen(),
-          child: SignupScreen(),
+          child: AuthScreen(),
+          // child: SignupScreen(),
         ),
       ),
     );

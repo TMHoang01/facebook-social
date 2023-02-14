@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:fb_copy/models/user_model.dart';
+
 class AuthModel {
   String? id;
   String? username;
@@ -40,5 +42,10 @@ class AuthModel {
       avatar: avatar ?? this.avatar,
       active: active ?? this.active,
     );
+  }
+
+  @override
+  String toString() {
+    return 'AuthModel(id: $id, username: $username, token: $token, avatar: $avatar, active: $active)';
   }
 }

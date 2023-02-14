@@ -33,6 +33,13 @@ class SignupLoadingState extends SignupState {}
 
 class SignupSuccessState extends SignupState {}
 
+class SignupErrorState extends SignupState {
+  final String message;
+  SignupErrorState({
+    required this.message,
+  });
+}
+
 class ErrorPhoneState extends SignupState {
   final String message;
   ErrorPhoneState({
@@ -49,15 +56,19 @@ class ErrorPasswordState extends SignupState {
 
 class SignupFailureState extends SignupState {
   final String message;
+  final bool? failurePhone;
   SignupFailureState({
     required this.message,
+    this.failurePhone,
   });
 }
 
-class SignupVerifyCode extends SignupState {
-  final String message;
-  SignupVerifyCode({
-    required this.message,
+class SignupVerifyCodeState extends SignupState {
+  final String code;
+  final String phone;
+  SignupVerifyCodeState({
+    required this.code,
+    required this.phone,
   });
 }
 
@@ -65,9 +76,32 @@ class SignupVerifyLoadingState extends SignupState {}
 
 class SignupVerifySuccessState extends SignupState {}
 
+class AwaitVerifyState extends SignupState {
+  final String phone;
+  final int seconds;
+  AwaitVerifyState({
+    required this.phone,
+    required this.seconds,
+  });
+}
+
 class SignupVerifyFailureState extends SignupState {
   final String message;
   SignupVerifyFailureState({
+    required this.message,
+  });
+  @override
+  // TODO: implement props
+  List<Object> get props => super.props + [message];
+}
+
+class SignupChangeInfoLoadingState extends SignupState {}
+
+class SignupChangeInfoSuccessState extends SignupState {}
+
+class SignupChangeInfoFailureState extends SignupState {
+  final String message;
+  SignupChangeInfoFailureState({
     required this.message,
   });
 }

@@ -31,26 +31,37 @@ class PickerImageBloc extends Bloc<PickerImageEvent, PickerImageState> {
   Future<void> _onSelectMultipleImages(onSelectMultipleImageEvent event, Emitter<PickerImageState> emit) async {
     try {
       String? message;
-
       List<ImageModel> oldImages = state.oldImages ?? [];
-      if (oldImages.length > 4) {
-        oldImages = oldImages.sublist(0, 4);
+      List<XFile> imagesChoosed = state.images ?? [];
+      emit(state.copyWith(images: imagesChoosed, oldImages: oldImages));
+
+      if (state.oldVideo != null || state.video != null) {
+        message = 'Không thể chọn ảnh mới cùng với video';
+        emit(state.copyWith(oldImages: oldImages, message: message));
+      }
+      int countImagesOld = imagesChoosed.length + oldImages.length;
+
+      if (countImagesOld >= 4) {
         message = 'Chỉ được chọn tối đa 4 ảnh cho 1 bài viết';
         emit(state.copyWith(oldImages: oldImages, message: message));
         return;
       }
       List<XFile> images = await _picker.pickMultiImage();
       // limit 4 images
-      int countImages = images.length + oldImages.length;
+      int countImages = images.length + countImagesOld;
 
       if (countImages > 4) {
-        int end = 4 - oldImages.length;
+        int end = 4 - countImagesOld;
         if (end < 0) end = 0;
         images = images.sublist(0, end);
         message = 'Chỉ được chọn tối đa 4 ảnh cho 1 bài viết';
       }
+      imagesChoosed = List<XFile>.from(imagesChoosed) + images;
+
+      Logger().d(imagesChoosed, countImages);
+
       if (images != null) {
-        emit(state.copyWith(images: images, oldImages: oldImages, message: message));
+        emit(state.copyWith(images: imagesChoosed, oldImages: oldImages, message: message));
       }
     } catch (e) {
       Logger().e(e);
@@ -81,6 +92,18 @@ class PickerImageBloc extends Bloc<PickerImageEvent, PickerImageState> {
 
   Future<void> _onSelectVideo(onSelevtVideoEvent event, Emitter<PickerImageState> emit) async {
     try {
+      String? message;
+
+      if (state.oldImages != null || state.images != null) {
+        message = 'Không thể chọn video cùng với ảnh';
+        emit(state.copyWith(message: message));
+        return;
+      }
+      if (state.oldVideo != null || state.video != null) {
+        message = 'Chỉ được chọn 1 video cho 1 bài viết';
+        emit(state.copyWith(message: message));
+        return;
+      }
       final video = await _picker.pickVideo(source: ImageSource.gallery);
       if (video != null) {
         emit(state.copyWith(video: video));
@@ -92,13 +115,32 @@ class PickerImageBloc extends Bloc<PickerImageEvent, PickerImageState> {
 
   Future<void> _onTakeImage(onTakeImageEvent event, Emitter<PickerImageState> emit) async {
     try {
+      String? message;
+      if (state.oldVideo != null || state.video != null) {
+        message = 'Không thể chọn ảnh mới cùng với video';
+        emit(state.copyWith(oldVideo: state.oldVideo, video: state.video, message: message));
+      }
+      List<ImageModel> oldImages = state.oldImages ?? [];
+      List<XFile> imagesChoosed = state.images ?? [];
+      emit(state.copyWith(images: imagesChoosed, oldImages: oldImages));
+
+      int countImagesOld = imagesChoosed.length + oldImages.length;
+
+      if (countImagesOld >= 4) {
+        message = 'Chỉ được chọn tối đa 4 ảnh cho 1 bài viết';
+        emit(state.copyWith(oldImages: oldImages, message: message));
+        return;
+      }
+
       final image = await _picker.pickImage(source: ImageSource.camera);
       List<XFile>? images;
       if (image != null) {
         images = [image];
       }
-      if (image != null) {
-        emit(state.copyWith(images: images));
+      imagesChoosed = List<XFile>.from(imagesChoosed) + images!;
+
+      if (images != null) {
+        emit(state.copyWith(images: imagesChoosed, oldImages: oldImages, message: message));
       }
     } catch (e) {
       Logger().e(e);

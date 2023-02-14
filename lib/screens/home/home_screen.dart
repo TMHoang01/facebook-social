@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fb_copy/constants.dart';
+import 'package:fb_copy/screens/friend/friend_screen.dart';
 import 'package:fb_copy/screens/home/setting_screen.dart';
 import 'package:fb_copy/screens/loading_screen.dart';
 import 'package:fb_copy/screens/login/login_screen.dart';
@@ -22,9 +23,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   TabController? _tabController;
   final List<Widget> _tabs = [
     PostScreen(),
-    LoadingScreen(text: '( FriendScreen('),
+    FriendsTab(),
     LoadingScreen(text: 'watch tab'),
-    ProfileScreen(),
+    // ProfileScreen(),
     NotificationsTab(),
     MenuTabScreen(),
   ];
@@ -32,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(vsync: this, length: 6);
+    _tabController = TabController(vsync: this, length: 5);
   }
 
   @override
@@ -64,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 Tab(icon: Icon(Icons.home, size: 30.0)),
                 Tab(icon: Icon(Icons.people, size: 30.0)),
                 Tab(icon: Icon(Icons.ondemand_video, size: 30.0)),
-                Tab(icon: Icon(Icons.account_circle, size: 30.0)),
+                // Tab(icon: Icon(Icons.account_circle, size: 30.0)),
                 Tab(icon: Icon(Icons.notifications, size: 30.0)),
                 Tab(icon: Icon(Icons.menu, size: 30.0)),
                 // Tab(icon: Icon(Icons.menu, size: 30.0)),
@@ -112,122 +113,116 @@ class TopBarApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
         Row(
-          children: <Widget>[
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: const <Widget>[
             Text('facebook', style: TextStyle(color: Colors.blueAccent, fontSize: 27.0, fontWeight: FontWeight.bold)),
           ],
         ),
-        Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
-          IconButton(onPressed: (){
-            showSearch(
-                context: context,
-                delegate: CustomSearch()
-            );
-          }, icon:   Icon(Icons.search, color: Colors.black)),
-          SizedBox(width: 15.0),
-          IconButton(onPressed: (){
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return HomePage();
+        Expanded(child: Container()),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            IconButton(
+                onPressed: () {
+                  showSearch(context: context, delegate: CustomSearch());
                 },
-              ),
-            );
-          }, icon: Icon(FontAwesomeIcons.facebookMessenger, color: Colors.black))
-        ]),
+                icon: Icon(Icons.search, color: Colors.black)),
+            // SizedBox(width: 15.0),
+            IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return HomePage();
+                      },
+                    ),
+                  );
+                },
+                icon: const Icon(FontAwesomeIcons.facebookMessenger, color: Colors.black))
+          ],
+        ),
       ],
     );
   }
 }
 
-class CustomSearch extends SearchDelegate{
-  List<String> allData = [
-    'Phan Nguyen', 'Minh Hoang', 'Khanh Hung', 'Thu Hieu', 'Thu Ha',
-    'Van Tien', 'Van Nhat'
-  ];
+class CustomSearch extends SearchDelegate {
+  List<String> allData = ['Phan Nguyen', 'Minh Hoang', 'Khanh Hung', 'Thu Hieu', 'Thu Ha', 'Van Tien', 'Van Nhat'];
   @override
   List<Widget>? buildActions(BuildContext context) {
-    return[
+    return [
       IconButton(
-          onPressed: (){
+          onPressed: () {
             query = '';
           },
-          icon: const Icon(Icons.clear)
-      )
+          icon: const Icon(Icons.clear))
     ];
   }
 
   @override
   Widget? buildLeading(BuildContext context) {
-    return
-      IconButton(
-          onPressed: (){
-           close(context, null);
-          },
-          icon: const Icon(Icons.arrow_back)
-      );
+    return IconButton(
+        onPressed: () {
+          close(context, null);
+        },
+        icon: const Icon(Icons.arrow_back));
   }
 
   @override
   Widget buildResults(BuildContext context) {
     List<String> matchQuery = [];
-    for(var item in allData){
-      if(item.toLowerCase().contains(query.toLowerCase())){
+    for (var item in allData) {
+      if (item.toLowerCase().contains(query.toLowerCase())) {
         matchQuery.add(item);
       }
     }
     return ListView.builder(
         itemCount: matchQuery.length,
-        itemBuilder: (context, index){
+        itemBuilder: (context, index) {
           var result = matchQuery[index];
           return ListTile(
             title: Text(
               result,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.black54, fontSize: 16, fontWeight: FontWeight.bold),
             ),
             leading: CircleAvatar(
-              backgroundImage: NetworkImage('https://i.picsum.photos/id/769/200/200.jpg?hmac=M55kAfuYOrcJ8a49hBRDhWtVLbJo88Y76kUz323SqLU'),
-            ),                  );
-        }
-    );
+              backgroundImage: NetworkImage(
+                  'https://i.picsum.photos/id/769/200/200.jpg?hmac=M55kAfuYOrcJ8a49hBRDhWtVLbJo88Y76kUz323SqLU'),
+            ),
+          );
+        });
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
     List<String> matchQuery = [];
-    for(var item in allData){
-      if(item.toLowerCase().contains(query.toLowerCase())){
+    for (var item in allData) {
+      if (item.toLowerCase().contains(query.toLowerCase())) {
         matchQuery.add(item);
       }
     }
     return ListView.builder(
-      itemCount: matchQuery.length,
-        itemBuilder: (context, index){
-         var result = matchQuery[index];
-         return ListTile(
-           title: Text(
-             result,
-             maxLines: 1,
-             overflow: TextOverflow.ellipsis,
-             style: TextStyle(
-                 color: Colors.black54,
-                 fontSize: 16,
-                 fontWeight: FontWeight.bold),
-           ),
-           leading: CircleAvatar(
-             backgroundImage: NetworkImage('https://i.picsum.photos/id/769/200/200.jpg?hmac=M55kAfuYOrcJ8a49hBRDhWtVLbJo88Y76kUz323SqLU'),
-           ),
-         );
-        }
-    );
+        itemCount: matchQuery.length,
+        itemBuilder: (context, index) {
+          var result = matchQuery[index];
+          return ListTile(
+            title: Text(
+              result,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: Colors.black54, fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            leading: CircleAvatar(
+              backgroundImage: NetworkImage(
+                  'https://i.picsum.photos/id/769/200/200.jpg?hmac=M55kAfuYOrcJ8a49hBRDhWtVLbJo88Y76kUz323SqLU'),
+            ),
+          );
+        });
   }
-
 }

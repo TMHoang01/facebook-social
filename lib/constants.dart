@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const host = '169.254.109.23';
+const host = '192.168.180.183';
 const baseUrl = "http://$host:5000/it4788";
 const authUrl = '$baseUrl/auth';
 const friendUrl = '$baseUrl/friend';

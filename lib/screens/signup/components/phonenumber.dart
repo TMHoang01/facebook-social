@@ -46,23 +46,23 @@ class _PhoneSignupState extends State<PhoneSignup> {
       print('isShowValidate: $isShowValidate ');
 
       messageValidate = 'Vui lòng nhập số điện thoại';
-    }
+    } else
     // value bắt đầu là  0
     if (!value.startsWith('0')) {
       isShowValidate = true;
       print('sđt không hợp lệ (bắt đầu bằng 0) isShowValidate: $isShowValidate');
       messageValidate = 'Số điện thoại không hợp lệ (bắt đầu bằng 0)';
+    } else if (value.length != 10) {
+      print('sđt không hợp lệ (10 số) isShowValidate: $isShowValidate');
+      isShowValidate = true;
+      messageValidate = 'Số điện thoại không hợp lệ (10 số)';
+    } else {
+      print('sđt hợp lệ isShowValidate: $isShowValidate nextNavigate: $nextNavigate');
+      nextNavigate = true;
+      // setState(() {});
+      if (messageValidate != '') return messageValidate;
     }
 
-    if (value.length < 10 || value.length > 11) {
-      print('sđt không hợp lệ (10-11 số) isShowValidate: $isShowValidate');
-      isShowValidate = true;
-      messageValidate = 'Số điện thoại không hợp lệ (10-11 số)';
-    }
-    print('sđt hợp lệ isShowValidate: $isShowValidate');
-    nextNavigate = true;
-    setState(() {});
-    if (messageValidate != '') return messageValidate;
     return null;
   }
 
@@ -106,7 +106,9 @@ class _PhoneSignupState extends State<PhoneSignup> {
                         // focusNode: _phoneNumberFocusNode,
                         controller: _phoneNumberController,
                         onChanged: (value) {
-                          setState(() {});
+                          setState(() {
+                            validatePhoneNumber(value);
+                          });
                         },
                         decoration: InputDecoration(
                           hintText: 'Số di động',
@@ -165,30 +167,6 @@ class _PhoneSignupState extends State<PhoneSignup> {
                 navigatorScreen: PasswordSignup(phoneNumber: _phoneNumberController.text),
                 text: 'Tiếp',
                 check: nextNavigate,
-              ),
-              ButtonTheme(
-                minWidth: double.infinity,
-                height: 42,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: MaterialButton(
-                  onPressed: () {
-                    if (validatePhoneNumber(_phoneNumberController.text) == null) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return PasswordSignup(phoneNumber: _phoneNumberController.text);
-                          },
-                        ),
-                      );
-                    }
-                  },
-                  child: Text('Tiếp'),
-                  color: AppColor.kPrimaryColor,
-                  textColor: AppColor.backgroundColor,
-                ),
               ),
             ],
           ),

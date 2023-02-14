@@ -26,11 +26,12 @@ class ProfileAvatar extends StatelessWidget {
           radius: radius ?? 20.0,
           backgroundColor: AppColor.kPrimaryColor,
           child: CircleAvatar(
-              radius: hasBorder ?? false ? radius! - 2 : radius,
-              backgroundColor: Colors.grey[200],
-              backgroundImage: CachedNetworkImageProvider(
-                avatar ?? avatarDefault,
-              )),
+            radius: hasBorder ?? false ? radius! - 2 : radius,
+            backgroundColor: Colors.grey[200],
+            backgroundImage: CachedNetworkImageProvider(
+              avatar ?? avatarDefault,
+            ),
+          ),
         ),
         isActive ?? false
             ? Positioned(

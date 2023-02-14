@@ -1,7 +1,9 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fb_copy/constants.dart';
 import 'package:fb_copy/screens/post/add_post_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:logger/logger.dart';
+import 'package:fb_copy/widgets/user_avatar_widget.dart';
 
 class CreateFeedWidget extends StatelessWidget {
   const CreateFeedWidget({
@@ -13,45 +15,31 @@ class CreateFeedWidget extends StatelessWidget {
     return Container(
       width: double.infinity,
       color: Colors.white,
-      padding: EdgeInsets.all(10),
-      child: Container(
+      padding: const EdgeInsets.all(10),
+      child: SizedBox(
         width: double.infinity,
         child: Row(
           children: <Widget>[
-            Container(
-              child: ClipOval(
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  color: Colors.grey,
-                  child: CachedNetworkImage(
-                    imageUrl: "https://store.donanimhaber.com/2a/71/96/2a7196fa4e85b977760a7f33586ee603.jpg",
-                    fit: BoxFit.cover,
-                    progressIndicatorBuilder: (context, url, downloadProgress) =>
-                        CircularProgressIndicator(value: downloadProgress.progress),
-                    errorWidget: (context, url, error) => Icon(Icons.error),
-                  ),
-                ),
-              ),
-            ),
+            UserAvatarWidget(user: authUser!),
             Expanded(
               child: GestureDetector(
                 onTap: () {
                   // navigate to create feed screen
+                  // Logger().d(authUser.toString());
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const AddPostScreen()));
                 },
                 child: Container(
                   height: 36,
-                  margin: EdgeInsets.only(left: 5),
-                  padding: EdgeInsets.only(left: 20, right: 4),
+                  margin: const EdgeInsets.only(left: 5),
+                  padding: const EdgeInsets.only(left: 20, right: 4),
                   alignment: Alignment.centerLeft,
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey, width: 1),
-                    borderRadius: BorderRadius.all(
+                    borderRadius: const BorderRadius.all(
                       Radius.circular(25),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     "Bạn đang nghĩ gì?",
                     style: TextStyle(color: AppColor.grayColor, fontSize: 16, height: 1.2),
                   ),
@@ -61,8 +49,8 @@ class CreateFeedWidget extends StatelessWidget {
             Container(
               width: 28,
               height: 28,
-              margin: EdgeInsets.all(8),
-              child: Icon(
+              margin: const EdgeInsets.all(8),
+              child: const Icon(
                 Icons.image,
                 color: AppColor.greenColor,
                 size: 28,
